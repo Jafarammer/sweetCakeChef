@@ -25,12 +25,9 @@ app.use(bodyParser.json());
 const userRoutes = require("./routes/user/user");
 app.use("/", userRoutes);
 
-// const userFindRoutes = require("./routes/user/searchUser");
-// app.use("/", userFindRoutes);
-
 // Import routes recipe
-// const recipeRoutes = require("./routes/recipe");
-// app.use("/", recipeRoutes);
+const recipeRoutes = require("./routes/recipe/recipe");
+app.use("/", recipeRoutes);
 
 // PORT take in bottom
 app.listen(port, () => {
