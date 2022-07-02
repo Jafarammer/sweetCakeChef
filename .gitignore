@@ -1,3 +1,6 @@
 node_modules/
 images/
 .env
+
+# Ignore all text files
+*.txt

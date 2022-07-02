@@ -1,8 +1,12 @@
 const userModel = require("../../model/userModel");
+const bcrypt = require("bcrypt");
+// const { emptyQuery } = require("pg-protocol/dist/messages");
+// const jwt = require("jsonwebtoken");
 
 // ALL USERS
 const getAllUsers = async (req, res) => {
   try {
+    const { page, size } = req.query;
     const getData = await userModel.userAllModel();
     res.send({
       data: getData.rows,
@@ -33,10 +37,22 @@ const addUser = async (req, res) => {
     const { name, email, password } = req.body;
     const data = await userModel.findModelEmail(email);
     const getEmail = data.rows;
+
+    // encrypt password
+    const salt = bcrypt.genSaltSync(15); //generate string
+    const hash = bcrypt.hashSync(password, salt); //encrypt password
+
+    // validate email
     if (getEmail.length != 0) {
       res.status(400).send("Email already exist");
+    } else if (req.body.email == "") {
+      res.status(400).send("Email is required!!!");
     } else {
-      const addUser = await userModel.addUserModel({ name, email, password });
+      const addUser = await userModel.addUserModel({
+        name,
+        email,
+        password: hash,
+      });
 
       if (addUser) {
         res.send("Data added successfully");
@@ -45,8 +61,9 @@ const addUser = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(`Errornya disini nih ${error}`);
-    res.status(400).send("Internal server error");
+    // console.log(`Errornya disini nih ${error}`);
+    res.status(500).send("Email invalid!!!");
+    // res.status(400).send(error?.message ?? "Something went wrong!");
   }
 };
 

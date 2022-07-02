@@ -1,5 +1,4 @@
 const db = require("../config/db");
-const crypto = require("crypto");
 
 // ALL USERS
 const userAllModel = () => {
@@ -43,15 +42,11 @@ const findModelEmail = (email) => {
 // ADD NEW USERS
 const addUserModel = (user) => {
   const { name, email, password } = user;
-  const hash = crypto
-    .createHmac("sha256", password)
-    .update("very very important")
-    .digest("hex");
 
   return new Promise((resolve, reject) => {
     db.query(
       `INSERT INTO users (name, email,password) VALUES ($1, $2,$3)`,
-      [name, email, hash],
+      [name, email, password],
       (error, result) => {
         if (error) {
           reject(error);

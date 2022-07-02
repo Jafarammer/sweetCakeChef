@@ -6,7 +6,11 @@ const helmet = require("helmet");
 const dotenv = require("dotenv");
 dotenv.config();
 
-app.use(cors());
+// app.use(
+//   cors({
+//     origin: "https://id-id.facebook.com/",
+//   })
+// );
 app.use(helmet());
 
 //import body parser
@@ -22,8 +26,14 @@ app.use(bodyParser.json());
 // app.use("/", userRoutes);
 
 // import routes users
+// const userRoutes = require("./routes/user/user");
+// app.use("/", cors, userRoutes);
+
 const userRoutes = require("./routes/user/user");
 app.use("/", userRoutes);
+//login
+const userLogin = require("./routes/user/login");
+app.use("/", userLogin);
 
 // Import routes recipe
 const recipeRoutes = require("./routes/recipe/recipe");
