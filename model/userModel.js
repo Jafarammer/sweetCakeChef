@@ -39,6 +39,19 @@ const findModelEmail = (email) => {
   });
 };
 
+const findModelPage = (page, size) => {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT * FROM users ORDER BY id ASC LIMIT $2 OFFSET (($1 - 1) * $2)",
+      [page, size],
+      (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      }
+    );
+  });
+};
+
 // ADD NEW USERS
 const addUserModel = (user) => {
   const { name, email, password } = user;
@@ -97,6 +110,7 @@ module.exports = {
   userAllModel,
   findModelId,
   findModelEmail,
+  findModelPage,
   addUserModel,
   editUserModel,
   deleteUserModel,

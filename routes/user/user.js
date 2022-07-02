@@ -7,6 +7,8 @@ Router.get("/users", validateToken.checkToken, controllerUser.getAllUsers);
 
 Router.get("/users/find", controllerUser.findUser);
 
+Router.get("/users/findPage", controllerUser.findPage);
+
 Router.post("/users/add", controllerUser.addUser);
 
 Router.patch("/users/edit", controllerUser.editUser);

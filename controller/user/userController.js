@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 // ALL USERS
 const getAllUsers = async (req, res) => {
   try {
-    const { page, size } = req.query;
+    // const { page, size } = req.query;
     const getData = await userModel.userAllModel();
     res.send({
       data: getData.rows,
@@ -25,6 +25,19 @@ const findUser = async (req, res) => {
     res.send({
       data: getData.rows,
       totalData: getData.rowCount,
+    });
+  } catch (err) {
+    res.status(400).send("Internal server error");
+  }
+};
+
+const findPage = async (req, res) => {
+  try {
+    const { page, size } = req.query;
+    const getData = await userModel.findModelPage(page, size);
+    res.send({
+      data: getData.rows,
+      total: getData.rowCount,
     });
   } catch (err) {
     res.status(400).send("Internal server error");
@@ -124,4 +137,11 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { findUser, getAllUsers, addUser, editUser, deleteUser };
+module.exports = {
+  findUser,
+  getAllUsers,
+  addUser,
+  editUser,
+  deleteUser,
+  findPage,
+};
