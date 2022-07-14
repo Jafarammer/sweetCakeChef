@@ -31,6 +31,7 @@ const findUser = async (req, res) => {
   }
 };
 
+// pagination
 const findPage = async (req, res) => {
   try {
     const { page, size } = req.query;
@@ -47,30 +48,35 @@ const findPage = async (req, res) => {
 // ADD NEW USER
 const addUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    const data = await userModel.findModelEmail(email);
-    const getEmail = data.rows;
-
-    // encrypt password
-    const salt = bcrypt.genSaltSync(15); //generate string
-    const hash = bcrypt.hashSync(password, salt); //encrypt password
-
-    // validate email
-    if (getEmail.length != 0) {
-      res.status(400).send("Email already exist");
-    } else if (req.body.email == "") {
-      res.status(400).send("Email is required!!!");
+    const { name, email, phoneNumber, password, confirmPassword } = req.body;
+    if (password != confirmPassword) {
+      res.status(400).send("Passwords are not the same!!!");
     } else {
-      const addUser = await userModel.addUserModel({
-        name,
-        email,
-        password: hash,
-      });
+      const data = await userModel.findModelEmail(email);
+      const getEmail = data.rows;
 
-      if (addUser) {
-        res.send("Data added successfully");
+      // encrypt password
+      const salt = bcrypt.genSaltSync(15); //generate string
+      const hash = bcrypt.hashSync(password, salt); //encrypt password
+
+      // validate email
+      if (getEmail.length != 0) {
+        res.status(400).send("Email already exist");
+      } else if (req.body.email == "") {
+        res.status(400).send("Email is required!!!");
       } else {
-        res.status(400).send("Data failed to add");
+        const addUser = await userModel.addUserModel({
+          name,
+          email,
+          phoneNumber,
+          password: hash,
+        });
+
+        if (addUser) {
+          res.send("Data added successfully");
+        } else {
+          res.status(400).send("Data failed to add");
+        }
       }
     }
   } catch (error) {
@@ -83,18 +89,20 @@ const addUser = async (req, res) => {
 // EDIT USERS
 const editUser = async (req, res) => {
   try {
-    const { name, email, password, id } = req.body;
+    const { name, email, phoneNumber, password, id } = req.body;
 
     const getData = await userModel.findModelId(id);
 
     if (getData.rowCount > 0) {
       let nameInput = name || getData?.rows[0]?.name;
       let emailInput = email || getData?.rows[0]?.email;
+      let phoneNumberInput = phoneNumber || getData?.rows[0]?.phoneNumber;
       let passInput = password || getData?.rows[0]?.password;
 
       const editDataUser = await userModel.editUserModel({
         name: nameInput,
         email: emailInput,
+        phoneNumber: phoneNumberInput,
         password: passInput,
         id,
       });

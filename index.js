@@ -35,13 +35,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-// const userRoutes = require("./routes/user/userRoutes");
-// app.use("/", userRoutes);
-
-// import routes users
-// const userRoutes = require("./routes/user/user");
-// app.use("/", cors, userRoutes);
-
 const userRoutes = require("./routes/user/user");
 app.use("/", cors(corsOptionsDelegate), userRoutes);
 //login
@@ -55,9 +48,10 @@ app.use("/", cors(corsOptionsDelegate), recipeRoutes);
 // image upload
 app.use("/images", express.static("images"));
 app.use("/", cors(corsOptionsDelegate), uploadRoutes);
-// const uploadRoutes = require("./routes/upload/index");
-// app.use("/images", express.static("images"));
-// app.use("/", cors(corsOptionsDelegate), uploadRoutes);
+
+app.use("*", (req, res) => {
+  res.send("I'm Jafarammer Success");
+});
 
 // PORT take in bottom
 app.listen(port, () => {

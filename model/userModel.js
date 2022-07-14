@@ -39,6 +39,7 @@ const findModelEmail = (email) => {
   });
 };
 
+// pagination
 const findModelPage = (page, size) => {
   return new Promise((resolve, reject) => {
     db.query(
@@ -54,12 +55,12 @@ const findModelPage = (page, size) => {
 
 // ADD NEW USERS
 const addUserModel = (user) => {
-  const { name, email, password } = user;
+  const { name, email, phoneNumber, password } = user;
 
   return new Promise((resolve, reject) => {
     db.query(
-      `INSERT INTO users (name, email,password) VALUES ($1, $2,$3)`,
-      [name, email, password],
+      `INSERT INTO users (name, email,phone_number,password) VALUES ($1, $2,$3,$4)`,
+      [name, email, phoneNumber, password],
       (error, result) => {
         if (error) {
           reject(error);
@@ -73,15 +74,15 @@ const addUserModel = (user) => {
 
 // EDIT USERS
 const editUserModel = (user) => {
-  const { name, email, password, id } = user;
+  const { name, email, phoneNumber, password, id } = user;
   const hash = crypto
     .createHmac("sha256", password)
     .update("very very important")
     .digest("hex");
   return new Promise((resolve, reject) => {
     db.query(
-      `UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4`,
-      [name, email, hash, id],
+      `UPDATE users SET name = $1, email = $2, phone_number = $3, password = $4 WHERE id = $5`,
+      [name, email, phoneNumber, hash, id],
       (error, result) => {
         if (error) {
           reject(error);

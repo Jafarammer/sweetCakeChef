@@ -12,6 +12,9 @@
     "nodemon": "^2.0.18",
     "pg": "^8.7.3"
   },
+  "scripts": {
+    "start": "node index.js"
+  },
   "devDependencies": {
     "eslint": "^8.19.0"
   }
