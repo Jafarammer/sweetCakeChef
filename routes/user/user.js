@@ -1,9 +1,8 @@
 const Router = require("express").Router();
 const controllerUser = require("../../controller/user/userController");
-const validateToken = require("../../middleware/verifyToken");
 
-Router.get("/users", validateToken.checkToken, controllerUser.getAllUsers);
-// Router.get("/users", controllerUser.getAllUsers);
+// Router.get("/users", validateToken.checkToken, controllerUser.getAllUsers);
+Router.get("/users", controllerUser.getAllUsers);
 
 Router.get("/users/find", controllerUser.findUser);
 

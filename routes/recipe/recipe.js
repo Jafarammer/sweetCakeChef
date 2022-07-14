@@ -1,6 +1,6 @@
 const Router = require("express").Router();
 const controllerRecipe = require("../../controller/recipe/recipeController");
-const uploadMiddleware = require("../../middleware/uploadImages");
+const uploadMiddleware = require("../../middleware/upload");
 
 // GET
 Router.get("/recipe", controllerRecipe.getAllRecipe);
@@ -11,14 +11,14 @@ Router.get("/recipe/find", controllerRecipe.getFindRecipe);
 
 Router.post(
   "/recipe/add",
-  uploadMiddleware.uploadImage,
+  uploadMiddleware.uploadSingle,
   controllerRecipe.addRecipe
 );
 
 // Edit
 Router.patch(
   "/recipe/edit",
-  uploadMiddleware.uploadImage,
+  uploadMiddleware.uploadSingle,
   controllerRecipe.editRecipe
 );
 

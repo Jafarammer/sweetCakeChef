@@ -5,7 +5,10 @@ const getAllRecipe = async (req, res) => {
   try {
     const getData = await recipeModel.recipeAllModel();
     res.send({
-      data: getData.rows,
+      data: getData.rows?.map((item) => ({
+        ...item,
+        ...{ photo: `http://localhost:8000/${item.photo}` },
+      })),
       totalData: getData.rowCount,
     });
   } catch (err) {
@@ -33,12 +36,11 @@ const getFindRecipe = async (req, res) => {
 const addRecipe = async (req, res) => {
   try {
     const { title_recipe, ingredients } = req.body;
-    const image_recipe = req.file.filename;
-
     const addUser = await recipeModel.addRecipeModel({
       title_recipe,
       ingredients,
-      image_recipe,
+      photo: req.file?.path,
+      // image_recipe: req.file?.path,
     });
 
     if (addUser) {

@@ -3,7 +3,7 @@ const db = require("../config/db");
 // GET ALL
 const recipeAllModel = () => {
   return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM recipe ORDER BY id_recipe ASC", (err, result) => {
+    db.query("SELECT * FROM recipe ORDER BY id_recipe DESC", (err, result) => {
       if (err) {
         reject(err);
       } else {
@@ -47,12 +47,12 @@ const recipeById = (id) => {
 };
 
 // ADD
-const addRecipeModel = (recipes) => {
-  const { title_recipe, ingredients, image_recipe } = recipes;
+const addRecipeModel = (props) => {
+  // const { title_recipe, ingredients, image_recipe } = recipes;
   return new Promise((resolve, reject) => {
     db.query(
-      "INSERT INTO recipe(title_recipe,ingredients, image_recipe) VALUES ($1,$2,$3)",
-      [title_recipe, ingredients, image_recipe],
+      "INSERT INTO recipe(title_recipe,ingredients,photo) VALUES ($1,$2,$3)",
+      [props.title_recipe, props.ingredients, props.photo],
       (err, result) => {
         if (err) {
           reject(err);

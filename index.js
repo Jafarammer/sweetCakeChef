@@ -2,16 +2,29 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 8000;
 const cors = require("cors");
+// const multer = require("multer");
 const helmet = require("helmet");
 const dotenv = require("dotenv");
 dotenv.config();
+const uploadRoutes = require("./routes/upload/index");
+// const multerUtils = require("./multer");
 
-// app.use(
-//   cors({
-//     origin: "https://id-id.facebook.com/",
-//   })
-// );
+// multer
+
+// helmet
 app.use(helmet());
+// cors
+var allowlist = "http://localhost:3000";
+var corsOptionsDelegate = function (req, callback) {
+  var corsOptions;
+  if (allowlist.indexOf(req.header("Origin")) !== -1) {
+    corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false }; // disable CORS for this request
+  }
+  callback(null, corsOptions); // callback expects two parameters: error and options
+};
+// app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
 //import body parser
 const bodyParser = require("body-parser");
@@ -30,14 +43,21 @@ app.use(bodyParser.json());
 // app.use("/", cors, userRoutes);
 
 const userRoutes = require("./routes/user/user");
-app.use("/", userRoutes);
+app.use("/", cors(corsOptionsDelegate), userRoutes);
 //login
 const userLogin = require("./routes/user/login");
-app.use("/", userLogin);
+app.use("/", cors(corsOptionsDelegate), userLogin);
 
 // Import routes recipe
 const recipeRoutes = require("./routes/recipe/recipe");
-app.use("/", recipeRoutes);
+// const upload = require("./multer");
+app.use("/", cors(corsOptionsDelegate), recipeRoutes);
+// image upload
+app.use("/images", express.static("images"));
+app.use("/", cors(corsOptionsDelegate), uploadRoutes);
+// const uploadRoutes = require("./routes/upload/index");
+// app.use("/images", express.static("images"));
+// app.use("/", cors(corsOptionsDelegate), uploadRoutes);
 
 // PORT take in bottom
 app.listen(port, () => {
