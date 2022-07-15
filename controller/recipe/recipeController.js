@@ -7,7 +7,8 @@ const getAllRecipe = async (req, res) => {
     res.send({
       data: getData.rows?.map((item) => ({
         ...item,
-        ...{ photo: `http://localhost:8000/${item.photo}` },
+        ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
+        // ...{ photo: `http://localhost:8000/${item.photo}` },
       })),
       totalData: getData.rowCount,
     });
