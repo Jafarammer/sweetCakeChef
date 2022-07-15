@@ -54,13 +54,11 @@ const findModelPage = (page, size) => {
 };
 
 // ADD NEW USERS
-const addUserModel = (user) => {
-  const { name, email, phoneNumber, password } = user;
-
+const addUserModel = (props) => {
   return new Promise((resolve, reject) => {
     db.query(
       `INSERT INTO users (name, email,phone_number,password) VALUES ($1, $2,$3,$4)`,
-      [name, email, phoneNumber, password],
+      [props.name, props.email, props.phoneNumber, props.password],
       (error, result) => {
         if (error) {
           reject(error);
