@@ -7,9 +7,6 @@ const helmet = require("helmet");
 const dotenv = require("dotenv");
 dotenv.config();
 const uploadRoutes = require("./routes/upload/index");
-// const multerUtils = require("./multer");
-
-// multer
 
 // helmet
 app.use(helmet());
@@ -18,16 +15,15 @@ var allowlist = "http://localhost:3000";
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (allowlist.indexOf(req.header("Origin")) !== -1) {
-    corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+    corsOptions = { origin: true };
   } else {
-    corsOptions = { origin: false }; // disable CORS for this request
+    corsOptions = { origin: false };
   }
-  callback(null, corsOptions); // callback expects two parameters: error and options
+  callback(null, corsOptions);
 };
-// app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
 //import body parser
-const bodyParser = require("body-parser");
+const bodyParser = require("body-parser"); // lupa
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));

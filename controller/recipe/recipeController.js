@@ -4,14 +4,14 @@ const recipeModel = require("../../model/recipeModel");
 const getAllRecipe = async (req, res) => {
   try {
     const getData = await recipeModel.recipeAllModel();
-    res.send({
-      data: getData.rows?.map((item) => ({
+    res.send(
+      getData.rows?.map((item) => ({
         ...item,
-        ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
-        // ...{ photo: `http://localhost:8000/${item.photo}` },
-      })),
-      totalData: getData.rowCount,
-    });
+        // ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
+        ...{ photo: `http://localhost:8000/${item.photo}` },
+      }))
+      // getData.rowCount
+    );
   } catch (err) {
     console.log(`Errornya niih ${err}`);
     res.status(400).send("Internal server error");
@@ -30,6 +30,24 @@ const getFindRecipe = async (req, res) => {
   } catch (err) {
     console.log(`Errornya disini ${err}`);
     res.status(400).send("Internal server error");
+  }
+};
+
+// FIND BY ID
+const getFindId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const getData = await recipeModel.recipeById(id);
+    res.send(
+      getData.rows?.map((item) => ({
+        ...item,
+        // ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
+        ...{ photo: `http://localhost:8000/${item.photo}` },
+      }))
+    );
+    // res.status(200).json(getData.rows);
+  } catch (err) {
+    res.status(400).send("Something wrong");
   }
 };
 
@@ -113,6 +131,7 @@ const deleteRecipe = async (req, res) => {
 module.exports = {
   getAllRecipe,
   getFindRecipe,
+  getFindId,
   addRecipe,
   editRecipe,
   deleteRecipe,

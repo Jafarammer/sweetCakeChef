@@ -80,7 +80,7 @@ const addUser = async (req, res) => {
       }
     }
   } catch (error) {
-    // console.log(`Errornya disini nih ${error}`);
+    console.log(`Errornya disini nih ${error}`);
     res.status(500).send("Email invalid!!!");
     // res.status(400).send(error?.message ?? "Something went wrong!");
   }

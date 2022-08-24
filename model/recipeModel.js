@@ -51,7 +51,7 @@ const addRecipeModel = (props) => {
   // const { title_recipe, ingredients, image_recipe } = recipes;
   return new Promise((resolve, reject) => {
     db.query(
-      "INSERT INTO recipe(title_recipe,ingredients,photo) VALUES ($1,$2,$3)",
+      "INSERT INTO recipe(title_recipe,ingredients,photo) VALUES ($1,$2,$3) RETURNING *",
       [props.title_recipe, props.ingredients, props.photo],
       (err, result) => {
         if (err) {

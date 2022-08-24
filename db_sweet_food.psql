@@ -1,0 +1,348 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.5 (Ubuntu 14.5-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.5 (Ubuntu 14.5-0ubuntu0.22.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: comments; Type: TABLE; Schema: public; Owner: jafarammer
+--
+
+CREATE TABLE public.comments (
+    id integer NOT NULL,
+    comment_message character varying NOT NULL,
+    user_id integer,
+    recipe_id integer
+);
+
+
+ALTER TABLE public.comments OWNER TO jafarammer;
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: jafarammer
+--
+
+CREATE SEQUENCE public.comments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.comments_id_seq OWNER TO jafarammer;
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jafarammer
+--
+
+ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
+
+
+--
+-- Name: recipe; Type: TABLE; Schema: public; Owner: jafarammer
+--
+
+CREATE TABLE public.recipe (
+    id_recipe integer NOT NULL,
+    title_recipe character varying(50),
+    ingredients text,
+    photo character varying(256)
+);
+
+
+ALTER TABLE public.recipe OWNER TO jafarammer;
+
+--
+-- Name: recipe_id_recipe_seq; Type: SEQUENCE; Schema: public; Owner: jafarammer
+--
+
+CREATE SEQUENCE public.recipe_id_recipe_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.recipe_id_recipe_seq OWNER TO jafarammer;
+
+--
+-- Name: recipe_id_recipe_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jafarammer
+--
+
+ALTER SEQUENCE public.recipe_id_recipe_seq OWNED BY public.recipe.id_recipe;
+
+
+--
+-- Name: test_upload; Type: TABLE; Schema: public; Owner: jafarammer
+--
+
+CREATE TABLE public.test_upload (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL,
+    icon character varying NOT NULL
+);
+
+
+ALTER TABLE public.test_upload OWNER TO jafarammer;
+
+--
+-- Name: test_upload_id_seq; Type: SEQUENCE; Schema: public; Owner: jafarammer
+--
+
+CREATE SEQUENCE public.test_upload_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.test_upload_id_seq OWNER TO jafarammer;
+
+--
+-- Name: test_upload_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jafarammer
+--
+
+ALTER SEQUENCE public.test_upload_id_seq OWNED BY public.test_upload.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: jafarammer
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL,
+    email character varying(25) NOT NULL,
+    password character varying NOT NULL,
+    phone_number character varying(13),
+    CONSTRAINT proper_email CHECK (((email)::text ~* '^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::text))
+);
+
+
+ALTER TABLE public.users OWNER TO jafarammer;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: jafarammer
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO jafarammer;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jafarammer
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: comments id; Type: DEFAULT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.comments_id_seq'::regclass);
+
+
+--
+-- Name: recipe id_recipe; Type: DEFAULT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.recipe ALTER COLUMN id_recipe SET DEFAULT nextval('public.recipe_id_recipe_seq'::regclass);
+
+
+--
+-- Name: test_upload id; Type: DEFAULT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.test_upload ALTER COLUMN id SET DEFAULT nextval('public.test_upload_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: jafarammer
+--
+
+COPY public.comments (id, comment_message, user_id, recipe_id) FROM stdin;
+1	test comment	23	34
+\.
+
+
+--
+-- Data for Name: recipe; Type: TABLE DATA; Schema: public; Owner: jafarammer
+--
+
+COPY public.recipe (id_recipe, title_recipe, ingredients, photo) FROM stdin;
+65	Panckae	bahan bahan	images/1657764382286_0.030542651455485403_.jpeg
+66	Bika ambon	Bahan bahan	images/1657764437386_0.27375026736868846_.png
+67	Nastar	Bahan bahan	images/1657764500814_0.06149796325859991_.jpeg
+\.
+
+
+--
+-- Data for Name: test_upload; Type: TABLE DATA; Schema: public; Owner: jafarammer
+--
+
+COPY public.test_upload (id, name, icon) FROM stdin;
+1	first upload	image-1656179118578.jpeg
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: jafarammer
+--
+
+COPY public.users (id, name, email, password, phone_number) FROM stdin;
+78	ilham	ilham@gmail.com	$2b$15$XRz/7rc/m18j5XlCYm3HG.HMPF0SIZZXz1l5WYY9BxC3iFr8EnTx2	085718973710
+79	hai	hai@gmail.com	$2b$15$spOAGnY.MfQ44aeGShRNLObEFhalY1fwn3Os9vgm8TXgAFHs1A7J2	456123457897
+80	mia	halo@outlook.com	$2b$15$JgRFsPQ26N5SO/baTV/QwOlJt5zHwN6mE2aKrKeR38nqrjpK9UIsS	45612452
+81	jijag	jigjag@mail.com	$2b$15$CF3ne/PxJodUrelenVuOaueiVQaqV.DQ1vFCaMAonREh8a6eZ.BJy	54578
+82	MY name	myname@gmail.com	$2b$15$XRa69SbVgvKw3opvzAJXc.0XAyhvoysnVJv7oqwQAuNWE/uSz.PV.	123456789
+83	Jafar Alkaff	jafalkaff96@gmail.com	$2b$15$O4MMOWfLoxwbWT0vdF3QMe5xAD7BW.E7EXhELrM0GKbeVxT0tMHKG	085718973710
+84	idrus	idrus@gmail.com	$2b$15$r7uvk4bNLF82OcP2DVdO6.gJTVr0UXYZkh70rqoL6SkKXivn/kMC2	456789
+85	bingung	bingung@gmail.com	$2b$15$UdVV1a..yG8DTO0YEziToO5GyvKCO2Ad0QePePRUBWoCNXugzaDea	085718973710
+86	jafarammer	jafarammer@gmail.com	$2b$15$6LTtZDCHEZCJp.taCjV52ePK.hILq9Ktdtr23AsaMVUDXDQeg4Jym	789654
+87	jafarammer	jafar@mail.com	$2b$15$MOiR6qahT0IPh1SxK3F96e5/yKEaYn5J4BC7ZawJcq5WBZmM.dpsi	5464
+88	jafarammer	jafar@gmail.com	$2b$15$39THPC3c4Z.MKNKjtZ3Ip.xpZLhRlwyZCw8.f8B4gk1Nzs46cBrTy	5464
+89	Jafar	jafar123@gmail.com	$2b$15$rgnT2y2qBAfCgGB825mOm.TIzdAkxlJMfwq.gRWHW.0R.0FZwAkLq	578545
+23	mr adin	tes@mail.com	jogja	\N
+24	Rian	iyan@gmail.com	lombok	\N
+27	Rian	iyan@gmail.com	ccdd30c6e86863c3265d3b39e90fa7ff15cf794fde78e1001512e0e8070bfe91	\N
+33	Adit	adit@mail.com	f101e87137bb80934aaf5937c3f991e165198c92296b144a41940d19d7975f6c	\N
+34	HAIKAL	Salim@gmail.com	9c8242c8e5068941f6f3b592ef1ace46b8f793d3b34e7501f0f480aa75f9302a	\N
+36	Bilkis	Salim@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+37	Bilkis	Salim@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+38	Bilkis	bilkis@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+39	Bilkis	bilkis@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+40	Bilkis	bilkis@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+41	Bilkis	bilkis@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+42	Jafarun	salim@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+43	Adit	Salim@gmail.com	4de451afca7de1e8ae377bc5890df9644bd42256540ccabec6f356bcb0e09e94	\N
+44	susah	susah@outlook.com	9c8242c8e5068941f6f3b592ef1ace46b8f793d3b34e7501f0f480aa75f9302a	\N
+46	susah	susah@gmail.com	Tangerang	\N
+48	susah	bisa@gmail.com	Tangerang	\N
+49	masaampun	masa@mail.com	$2b$15$rjUhjB1Bqu.q3Iii59o/Ee18T3wl7bx9zcY1y/ELz5z3T4AusEu.K	\N
+50	Wan Jafar	wan@gmail.com	$2b$15$yCJ9g5E8vl/uPbV5ErMkGul7szgUv/58B0rLt8cay/YlxMpQ2Wrd6	\N
+53	Jafar Alkaff	onejafar@gmail.com	$2b$15$ljPGQlWOuz3FUrMpR2Sdxefol71zUzijg0OJZtjNX4jj/ahqnWNH6	\N
+70	Danial	danil@gmail.com	$2b$15$oZSSI/6xmQKkNcLSeDMS3.3zJUzdZkXdb/HBaRZOm/KFt.IGtNUQC	\N
+71	Mia	mia@gmail.com	$2b$15$.jF1Btz4dvdjgiwWBzrN6un65MlgX0ylMN5FivjeJimryCwBz4ldy	\N
+73	Aldo wake up	aldo@gmail.com	$2b$15$5AvM73nKJ.ckIXPo4aix2uFyyyyUSIIlfKcxi868IOYRx8jF53q2.	\N
+74	Vista paramita	cici@gmail.com	$2b$15$AEylbkxiD9W3aRVXcbKL7uJpHYqEmSVBt8/DrAG583Bj8qziFy5hS	\N
+75	Dina	dina@gmail.com	979234db73c63245a40f6fd84c1a5f37306adbc50d77c194dbc3bb7cfc4d5d09	\N
+76	nanang	nanang@gmail.com	c7ebd300d716e2edd3de963041a404948ea1821a752ecccb5cc5dca1984e50c1	\N
+77	kevin	kevin@gmail.com	$2b$15$.vyAtEYBwBgmEdXkRgSdvuR3syTq3JPJ1ywRFlf5QwFYWMphqKOrm	\N
+\.
+
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jafarammer
+--
+
+SELECT pg_catalog.setval('public.comments_id_seq', 5, true);
+
+
+--
+-- Name: recipe_id_recipe_seq; Type: SEQUENCE SET; Schema: public; Owner: jafarammer
+--
+
+SELECT pg_catalog.setval('public.recipe_id_recipe_seq', 67, true);
+
+
+--
+-- Name: test_upload_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jafarammer
+--
+
+SELECT pg_catalog.setval('public.test_upload_id_seq', 1, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jafarammer
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 89, true);
+
+
+--
+-- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: recipe recipe_pkey; Type: CONSTRAINT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.recipe
+    ADD CONSTRAINT recipe_pkey PRIMARY KEY (id_recipe);
+
+
+--
+-- Name: test_upload test_upload_pkey; Type: CONSTRAINT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.test_upload
+    ADD CONSTRAINT test_upload_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: jafarammer
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+

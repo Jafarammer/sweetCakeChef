@@ -1,14 +1,19 @@
 const Router = require("express").Router();
 const controllerRecipe = require("../../controller/recipe/recipeController");
 const uploadMiddleware = require("../../middleware/upload");
-
+const validateToken = require("../../middleware/verifyToken");
+// Router.post("/login", validateToken.checkToken, controllerLogin.login);
 // GET
+// Router.get("/recipe", validateToken.checkToken, controllerRecipe.getAllRecipe);
 Router.get("/recipe", controllerRecipe.getAllRecipe);
 
 // FIND NAME
 Router.get("/recipe/find", controllerRecipe.getFindRecipe);
-// POST
 
+// FIND ID
+Router.get("/recipe/:id", controllerRecipe.getFindId);
+
+// POST
 Router.post(
   "/recipe/add",
   uploadMiddleware.uploadSingle,

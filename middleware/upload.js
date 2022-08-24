@@ -6,7 +6,7 @@ const uploadSingle = (req, res, next) => {
   uploadSingle(req, res, (err) => {
     try {
       if (err instanceof multer.MulterError) {
-        res.status(400).send(err?.message ?? "sometihng went wrong");
+        res.status(400).send(err?.meessag ?? "sometihng went wrong");
         return;
       } else if (err) {
         res.status(400).send(err ?? "something went wrong 2");

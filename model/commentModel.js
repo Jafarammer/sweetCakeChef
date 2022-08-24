@@ -20,7 +20,7 @@ const addComModel = (comment) => {
   const { comment_message, user_id, recipe_id } = comment;
   return new Promise((reject, resolve) => {
     db.query(
-      "INSERT INTO comments(comment_message,user_id,recipe_id) VALUES ($1,$2,$3)",
+      "INSERT INTO comments(comment_message,user_id,recipe_id) VALUES ($1,$2,$3) RETURNING *",
       [comment_message, user_id, recipe_id],
       (err, result) => {
         if (err) {
