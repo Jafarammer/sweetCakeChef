@@ -73,7 +73,7 @@ const addUser = async (req, res) => {
         });
 
         if (addUser) {
-          res.send("Data added successfully");
+          res.status(200).send("Data added successfully");
         } else {
           res.status(400).send("Data failed to add");
         }

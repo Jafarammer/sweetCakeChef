@@ -30,6 +30,7 @@ const login = async (req, res) => {
         res.status(200).send({
           user: { ...getEmail?.rows[0], ...{ password: null } },
           token,
+          message: "Login success",
         });
       } else {
         res.status(401).send("Incorrect password!!!");
