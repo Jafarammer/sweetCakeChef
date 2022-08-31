@@ -1,11 +1,20 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 8000;
+// const port = process.env.PORT || 8000;
+const port = 8000;
 const cors = require("cors");
-// const multer = require("multer");
+
 const helmet = require("helmet");
 const dotenv = require("dotenv");
 dotenv.config();
+// user
+const userRoutes = require("./routes/user/userRoutes");
+const searchUserRoutes = require("./routes/user/searchRoutes");
+const authRoutes = require("./routes/user/auth/authRoutes");
+// recipe
+const searchRecipeRoutes = require("./routes/recipe/searchRecipeRoutes");
+const recipeRoutes = require("./routes/recipe/recipeRoutes");
+// upload
 const uploadRoutes = require("./routes/upload/index");
 
 // helmet
@@ -21,29 +30,25 @@ var corsOptionsDelegate = function (req, callback) {
   }
   callback(null, corsOptions);
 };
-
 //import body parser
-const bodyParser = require("body-parser"); // lupa
+const bodyParser = require("body-parser");
 
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
 app.use(bodyParser.json());
+// app.use("/", cors(corsOptionsDelegate), userRoutes);
 
-const userRoutes = require("./routes/user/user");
-app.use("/", cors(corsOptionsDelegate), userRoutes);
-//login
-const userLogin = require("./routes/user/login");
-app.use("/", cors(corsOptionsDelegate), userLogin);
-
-// Import routes recipe
-const recipeRoutes = require("./routes/recipe/recipe");
-// const upload = require("./multer");
-app.use("/", cors(corsOptionsDelegate), recipeRoutes);
+// user
+app.use("/users", cors(corsOptionsDelegate), userRoutes);
+app.use("/users", cors(corsOptionsDelegate), searchUserRoutes);
+// auth
+app.use("/", cors(corsOptionsDelegate), authRoutes);
+// app.use("/", cors(corsOptionsDelegate), userLogin); example
+// routes recipe
+app.use("/recipe", cors(corsOptionsDelegate), searchRecipeRoutes);
+app.use("/recipe", cors(corsOptionsDelegate), recipeRoutes);
 // image upload
 app.use("/images", express.static("images"));
-app.use("/", cors(corsOptionsDelegate), uploadRoutes);
+app.use("/upload", cors(corsOptionsDelegate), uploadRoutes);
 
 app.use("*", (req, res) => {
   res.send("I'm Jafarammer Success");
