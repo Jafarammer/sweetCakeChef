@@ -20,7 +20,7 @@ const uploadRoutes = require("./routes/upload/index");
 // helmet
 app.use(helmet());
 // cors
-var allowlist = "http://localhost:3000";
+var allowlist = "https://sweet-cake-react.web.app/";
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (allowlist.indexOf(req.header("Origin")) !== -1) {
