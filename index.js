@@ -1,11 +1,11 @@
 const express = require("express");
+const dotenv = require("dotenv");
 const app = express();
-// const port = process.env.PORT || 8000;
-const port = 8000;
+const port = process.env.PORT || 8000;
+// const port = 8000;
 const cors = require("cors");
 
 const helmet = require("helmet");
-const dotenv = require("dotenv");
 dotenv.config();
 // user
 const userRoutes = require("./routes/user/userRoutes");
