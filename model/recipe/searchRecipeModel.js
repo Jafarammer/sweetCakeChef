@@ -59,4 +59,26 @@ const recipeByUser = (id) => {
   });
 };
 
-module.exports = { recipeAllModel, recipeById, recipeByname, recipeByUser };
+const recipeUserId = (user_id) => {
+  return new Promise((resolve, rejects) => {
+    db.query(
+      "SELECT * FROM recipe WHERE user_id = ANY ($1)",
+      [user_id],
+      (error, result) => {
+        if (error) {
+          rejects(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
+
+module.exports = {
+  recipeAllModel,
+  recipeById,
+  recipeByname,
+  recipeByUser,
+  recipeUserId,
+};

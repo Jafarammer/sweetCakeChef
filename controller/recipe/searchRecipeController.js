@@ -55,12 +55,12 @@ const findRecipeId = async (req, res) => {
 // base with user_id
 const findRecipeUser = async (req, res) => {
   try {
-    const { name } = req.body;
-    const getData = await searchModelUser.getByName(name);
+    const { id } = req.params;
+    const getData = await searchModelUser.getById(id);
     if (getData?.rowCount) {
       const id = getData.rows.map((res) => res.id);
       const getRecipeUser = await model.recipeByUser(id);
-      res.status(200).json({
+      res.status(200).send({
         user: getData?.rows,
         recipe: getRecipeUser?.rows?.map((item) => ({
           ...item,
@@ -76,9 +76,24 @@ const findRecipeUser = async (req, res) => {
   }
 };
 
+// based with user id tes
+const findRecipeUserId = async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    const getData = model.recipeUserId(user_id);
+    res.send({
+      data: getData.rows,
+      totalData: getData.rowCount,
+    });
+  } catch (error) {
+    res.status(400).send("Any error!!!");
+  }
+};
+
 module.exports = {
   findAllRecipe,
   findRecipeName,
   findRecipeId,
   findRecipeUser,
+  findRecipeUserId,
 };

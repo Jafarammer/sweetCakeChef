@@ -15,7 +15,13 @@ const findById = async (req, res) => {
   try {
     const { id } = req.params;
     const getData = await model.getById(id);
-    res.send({ data: getData.rows, totalData: getData.rowCount });
+    res.send({
+      data: getData.rows?.map((item) => ({
+        ...item,
+        ...{ photo: `http://localhost:8000/${item.photo}` },
+      })),
+      totalData: getData.rowCount,
+    });
   } catch (error) {
     res.status(400).send("Any error");
   }

@@ -8,6 +8,8 @@ Router.get("/name", controller.findRecipeName);
 // Find id
 Router.get("/id/:id", controller.findRecipeId);
 // Find user id
-Router.get("/recipebyuser", controller.findRecipeUser);
+Router.get("/recipebyuser/:id", controller.findRecipeUser);
+// find user id tes
+Router.get("/recipe/userId", controller.findRecipeUserId);
 
 module.exports = Router;
