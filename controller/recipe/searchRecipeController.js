@@ -9,8 +9,8 @@ const findAllRecipe = async (req, res) => {
       data: getData.rows,
       data: getData.rows?.map((item) => ({
         ...item,
-        // ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
-        ...{ photo: `http://localhost:8000/${item.photo}` },
+        ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
+        // ...{ photo: `http://localhost:8000/${item.photo}` },
       })),
       totalData: getData.rowCount,
     });
@@ -42,8 +42,8 @@ const findRecipeId = async (req, res) => {
     res.send(
       getData.rows?.map((item) => ({
         ...item,
-        // ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
-        ...{ photo: `http://localhost:8000/${item.photo}` },
+        ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
+        // ...{ photo: `http://localhost:8000/${item.photo}` },
       }))
     );
     // res.status(200).json(getData.rows);
@@ -64,7 +64,8 @@ const findRecipeUser = async (req, res) => {
         user: getData?.rows,
         recipe: getRecipeUser?.rows?.map((item) => ({
           ...item,
-          ...{ photo: `http://localhost:8000/${item.photo}` },
+          ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
+          // ...{ photo: `http://localhost:8000/${item.photo}` },
         })),
         jumlahData: getRecipeUser?.rowCount,
       });
