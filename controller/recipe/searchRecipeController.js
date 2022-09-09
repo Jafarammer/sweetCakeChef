@@ -5,13 +5,17 @@ const searchModelUser = require("../../model/user/searchUserModel");
 const findAllRecipe = async (req, res) => {
   try {
     const getData = await model.recipeAllModel();
+    // res.send({
+    //   data: getData.rows,
+    //   data: getData.rows?.map((item) => ({
+    //     ...item,
+    //     // ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
+    //     ...{ photo: `http://localhost:8000/${item.photo}` },
+    //   })),
+    //   totalData: getData.rowCount,
+    // });
     res.send({
       data: getData.rows,
-      data: getData.rows?.map((item) => ({
-        ...item,
-        ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
-        // ...{ photo: `http://localhost:8000/${item.photo}` },
-      })),
       totalData: getData.rowCount,
     });
   } catch (error) {
@@ -39,14 +43,7 @@ const findRecipeId = async (req, res) => {
   try {
     const { id } = req.params;
     const getData = await model.recipeById(id);
-    res.send(
-      getData.rows?.map((item) => ({
-        ...item,
-        ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
-        // ...{ photo: `http://localhost:8000/${item.photo}` },
-      }))
-    );
-    // res.status(200).json(getData.rows);
+    res.send({ data: getData.rows, totalData: getData.rowCount });
   } catch (error) {
     res.status(400).send("Any error");
   }
@@ -62,11 +59,7 @@ const findRecipeUser = async (req, res) => {
       const getRecipeUser = await model.recipeByUser(id);
       res.status(200).send({
         user: getData?.rows,
-        recipe: getRecipeUser?.rows?.map((item) => ({
-          ...item,
-          ...{ photo: `https://sweet-cake-chef.herokuapp.com/${item.photo}` },
-          // ...{ photo: `http://localhost:8000/${item.photo}` },
-        })),
+        recipe: getRecipeUser?.rows,
         jumlahData: getRecipeUser?.rowCount,
       });
     } else {

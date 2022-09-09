@@ -1,15 +1,19 @@
 const model = require("../../model/recipe/recipeModel");
 const searchModel = require("../../model/recipe/searchRecipeModel");
-const path = require("path");
+const cloudinary = require("../../utils/cloudinary");
 
 // ADD
 const addRecipe = async (req, res) => {
   try {
     const { title_recipe, ingredients, user_id } = req.body;
+    const uploadImages = req?.file
+      ? await cloudinary.uploader.upload(req?.file?.path, { folder: "recipe" })
+      : null;
+    const photo = req?.file ? uploadImages.secure_url : null;
     const getData = await model.addRecipeModel({
       title_recipe,
       ingredients,
-      photo: req.file?.path,
+      photo,
       user_id,
     });
     if (getData) {
@@ -28,17 +32,21 @@ const editRecipe = async (req, res) => {
   try {
     const { id } = req.params;
     const { title_recipe, ingredients, user_id } = req.body;
-    // const image = req.file.filename;
+    const uploadImages = cloudinary.uploader.upload(req.file.path, {
+      folder: "recipe",
+    });
+    const photo = uploadImages?.secure_url;
     const getData = await searchModel.recipeById(id);
     if (getData.rowCount > 0) {
       let titleInput = title_recipe || getData?.rows[0]?.title_recipe;
       let titleIngredients = ingredients || getData?.rows[0]?.ingredients;
+      let inputImages = photo || getData?.rows[0]?.photo;
       let titleUserId = user_id || getData?.rows[0]?.user_id;
 
       const editData = await model.editRecipeModel({
         title_recipe: titleInput,
         ingredients: titleIngredients,
-        photo: req.file?.path,
+        photo: inputImages,
         user_id: titleUserId,
         id,
       });

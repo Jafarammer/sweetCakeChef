@@ -4,7 +4,7 @@ const { unlinkSync } = require("fs");
 
 // single upload
 const uploadSingle = (req, res, next) => {
-  const uploadSingle = multerUtils.single("image");
+  const uploadSingle = multerUtils.single("photo");
   uploadSingle(req, res, function (err) {
     try {
       if (err instanceof multer.MulterError) {
@@ -24,7 +24,7 @@ const uploadSingle = (req, res, next) => {
 };
 // multiple upload
 const uploadMultiple = (req, res, next) => {
-  const uploadSingle = multerUtils.array("images", 5);
+  const uploadSingle = multerUtils.array("photo", 5);
   uploadSingle(req, res, function (err) {
     try {
       if (err instanceof multer.MulterError) {
