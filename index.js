@@ -1,12 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
 const app = express();
 const port = process.env.PORT || 8000;
 // const port = 8000;
 const cors = require("cors");
 
 const helmet = require("helmet");
-dotenv.config();
 // user
 const userRoutes = require("./routes/user/userRoutes");
 const searchUserRoutes = require("./routes/user/searchRoutes");
@@ -21,7 +21,7 @@ const uploadRoutes = require("./routes/upload/index");
 app.use(helmet());
 // cors
 // var allowlist = "http://localhost:3000/";
-var allowlist = "https://sweet-cake-react.web.app/";
+var allowlist = ["https://sweet-cake-react.web.app/", "http://localhost:3000/"];
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (allowlist.indexOf(req.header("Origin")) !== -1) {
