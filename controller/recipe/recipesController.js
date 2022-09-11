@@ -13,10 +13,7 @@ const addRecipe = async (req, res) => {
     const getData = await model.addRecipeModel({
       title_recipe,
       ingredients,
-      photo: {
-        public_id: uploadImages.public_id,
-        url: uploadImages.secure_url,
-      },
+      photo: uploadImages.secure_url,
       user_id,
     });
     if (getData) {
@@ -38,18 +35,18 @@ const editRecipe = async (req, res) => {
     const uploadImages = cloudinary.uploader.upload(req.file.path, {
       folder: "recipe",
     });
-    const photo = uploadImages?.secure_url;
+    // const photo = uploadImages?.secure_url;
     const getData = await searchModel.recipeById(id);
     if (getData.rowCount > 0) {
       let titleInput = title_recipe || getData?.rows[0]?.title_recipe;
       let titleIngredients = ingredients || getData?.rows[0]?.ingredients;
-      let inputImages = photo || getData?.rows[0]?.photo;
+      // let inputImages = photo || getData?.rows[0]?.photo;
       let titleUserId = user_id || getData?.rows[0]?.user_id;
 
       const editData = await model.editRecipeModel({
         title_recipe: titleInput,
         ingredients: titleIngredients,
-        photo: inputImages,
+        photo: (await uploadImages).secure_url,
         user_id: titleUserId,
         id,
       });
