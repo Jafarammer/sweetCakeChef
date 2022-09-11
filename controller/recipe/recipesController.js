@@ -9,11 +9,14 @@ const addRecipe = async (req, res) => {
     const uploadImages = req?.file
       ? await cloudinary.uploader.upload(req?.file?.path, { folder: "recipe" })
       : null;
-    const photo = req?.file ? uploadImages.secure_url : null;
+    // const photo = req?.file ? uploadImages.secure_url : null;
     const getData = await model.addRecipeModel({
       title_recipe,
       ingredients,
-      photo,
+      photo: {
+        public_id: uploadImages.public_id,
+        url: uploadImages.secure_url,
+      },
       user_id,
     });
     if (getData) {

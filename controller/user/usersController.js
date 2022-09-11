@@ -46,10 +46,14 @@ const editUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, phone_number, password } = req.body;
-    const uploadImages = req?.file?.path
-      ? await cloudinary.uploader.upload(req?.file?.path, { folder: "user" })
-      : undefined;
-    const photo = uploadImages?.secure_url;
+    const uploadImages =
+      (await cloudinary.uploader.upload(req?.file?.path, {
+        folder: "user",
+      })) || null;
+    // const uploadImages = req?.file
+    //   ? await cloudinary.uploader.upload(req?.file?.path, { folder: "user" })
+    //   : null;
+    const photo = uploadImages.secure_url;
     const searchId = await searchModel.getById(id);
     if (searchId.rowCount > 0) {
       let inputName = name || searchId?.rows[0]?.name;
