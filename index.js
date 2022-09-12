@@ -14,6 +14,8 @@ const authRoutes = require("./routes/user/auth/authRoutes");
 // recipe
 const searchRecipeRoutes = require("./routes/recipe/searchRecipeRoutes");
 const recipeRoutes = require("./routes/recipe/recipeRoutes");
+// comment
+const commentRoutes = require("./routes/comments/commentsRoutes");
 // upload
 const uploadRoutes = require("./routes/upload/index");
 
@@ -49,9 +51,11 @@ app.use("/users", searchUserRoutes);
 // auth
 app.use("/", authRoutes);
 // app.use("/", userLogin); example
-// routes recipe
+// recipe
 app.use("/recipe", searchRecipeRoutes);
 app.use("/recipe", recipeRoutes);
+// comment
+app.use("/comment", commentRoutes);
 // image upload
 app.use("/images", express.static("images"));
 app.use("/upload", uploadRoutes);

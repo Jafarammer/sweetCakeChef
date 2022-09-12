@@ -1,56 +1,43 @@
-const commentModel = require("../../model/commentModel");
-
-const getAllComments = async (req, res) => {
-  try {
-    const { id } = req.body;
-    const getData = await commentModel.findComModel(id);
-    res.send({
-      data: getData.rows,
-      totalData: getData.rowCount,
-    });
-  } catch (err) {
-    console.log(`Errornya niih ${err}`);
-    res.status(400).send("Internal server error");
-  }
-};
+const model = require("../../model/comment/commentModel");
 
 const addComment = async (req, res) => {
   try {
-    const { comment_message, user_id, recipe_id } = req.body;
-    const getCom = await commentModel.addComModel(
-      comment_message,
+    const { recipe_id, user_id, comment_message } = req.body;
+    const getData = await model.addCommentModel({
+      recipe_id,
       user_id,
-      recipe_id
-    );
-    if (getCom) {
-      res.status(200).send("Comment added successfully");
+      comment_message,
+    });
+    if (getData) {
+      const getDataRecipe = await model.getCommentRecipe(recipe_id);
+      res.status(200).send({
+        message: "Comment added successfully",
+        data: getDataRecipe.rows,
+      });
     } else {
-      res.status(400).send("Comment fail to add!!");
-    }
-  } catch (err) {
-    console.log(`IN HERE ${err}`);
-    res.status(500).send("Internal server error!!!");
-  }
-};
-
-const deleteComment = async (req, res) => {
-  try {
-    const { id } = req.body;
-
-    // Check user by id
-    //   const getData = await recipeModel.recipeById(id);
-
-    const delRecipe = await commentModel.deleteComModel(id);
-
-    if (delRecipe) {
-      res.send("Data deleted successfully");
-    } else {
-      res.status(400).send("Data failed to delete");
+      res.status(400).json({ message: "Comment failed" });
     }
   } catch (error) {
-    console.log(`IN HERE ${error}`);
-    res.status(500).send("Internal server error");
+    res.status(400).send("Any error!!!");
   }
 };
 
-module.exports = { addComment, deleteComment, getAllComments };
+const getComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const getData = await model.getCommentRecipe(id);
+    if (getData.rowCount > 0) {
+      res.status(200).send({
+        data: getData.rows,
+        totalData: getData.rowCount,
+      });
+    } else {
+      res.status(400).send("Comment not found!!!");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("Any error!!!");
+  }
+};
+
+module.exports = { addComment, getComment };
