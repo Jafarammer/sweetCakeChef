@@ -41,7 +41,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // app.use("/", cors(corsOptionsDelegate), userRoutes);
 const corsOptions = {
-  origins: ["https://sweet-cake-react.web.app/", "http://localhost:3000/"],
+  origins: ["https://sweet-cake-react.web.app", "http://localhost:3000/"],
 };
 app.use(cors(corsOptions));
 
