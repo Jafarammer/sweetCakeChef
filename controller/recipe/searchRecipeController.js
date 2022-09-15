@@ -28,11 +28,16 @@ const findAllRecipe = async (req, res) => {
 const findRecipeName = async (req, res) => {
   try {
     const { title_recipe } = req.query;
-    const getData = await model.recipeByname(title_recipe);
-    res.send({
-      data: getData.rows,
-      totalData: getData.rowCount,
-    });
+    const title = `%${title_recipe.toLowerCase()}%`;
+    const getData = await model.recipeByname(title);
+    if (getData.rowCount > 0) {
+      res.send({
+        data: getData.rows,
+        totalData: getData.rowCount,
+      });
+    } else {
+      res.status(400).send(`Data ${title_recipe} not found`);
+    }
   } catch (error) {
     res.status(400).send("Any error");
   }
@@ -84,10 +89,34 @@ const findRecipeUserId = async (req, res) => {
   }
 };
 
+// base with page & search
+const findPageRecipe = async (req, res) => {
+  try {
+    const { page } = parseInt(req.query.page) || 0;
+    const { limit } = parseInt(req.query.limit) || 5;
+    const getAllRecipe = await model.recipeAllModel();
+    const getData = await model.recipePageModel({ page, limit });
+    if (getData.rowCount > 0) {
+      res.status(200).send({
+        totalData: getAllRecipe.rowCount,
+        data: getData.rows,
+        page: page,
+        limit,
+      });
+    } else {
+      res.status(400).send("Data not found!!!");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("Any error!!!");
+  }
+};
+
 module.exports = {
   findAllRecipe,
   findRecipeName,
   findRecipeId,
   findRecipeUser,
   findRecipeUserId,
+  findPageRecipe,
 };

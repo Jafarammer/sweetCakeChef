@@ -16,8 +16,7 @@ const recipeAllModel = () => {
 const recipeByname = (title_recipe) => {
   return new Promise((resolve, reject) => {
     db.query(
-      // `SELECT * FROM recipe WHERE title_recipe LIKE'%${title_recipe}%'`,
-      "SELECT * FROM recipe WHERE title_recipe = $1",
+      "SELECT * FROM recipe WHERE LOWER(title_recipe) LIKE $1",
       [title_recipe],
       (error, result) => {
         if (error) {
@@ -75,10 +74,28 @@ const recipeUserId = (user_id) => {
   });
 };
 
+// page
+const recipePageModel = (props) => {
+  return new Promise((resolve, rejects) => {
+    db.query(
+      "SELECT * FROM recipe ORDER BY id DESC LIMIT $2 OFFSET (($1 - 1) * $2)",
+      [props.page, props.limit],
+      (error, result) => {
+        if (error) {
+          rejects(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
+
 module.exports = {
   recipeAllModel,
   recipeById,
   recipeByname,
   recipeByUser,
   recipeUserId,
+  recipePageModel,
 };
