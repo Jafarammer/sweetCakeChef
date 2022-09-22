@@ -43,7 +43,8 @@ app.use(bodyParser.json());
 const corsOptions = {
   origins: [
     "https://sweet-cake-react.web.app",
-    "https://sweet-cake-responsive.vercel.app/",
+    "https://sweet-cake-responsive.vercel.app",
+    "http://localhost:3000/",
   ],
 };
 app.use(cors(corsOptions));
@@ -55,8 +56,8 @@ app.use("/users", searchUserRoutes);
 app.use("/", authRoutes);
 // app.use("/", userLogin); example
 // recipe
-app.use("/recipe", searchRecipeRoutes);
-app.use("/recipe", recipeRoutes);
+app.use("/", searchRecipeRoutes);
+app.use("/", recipeRoutes);
 // comment
 app.use("/comment", commentRoutes);
 // image upload

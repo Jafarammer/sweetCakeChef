@@ -14,10 +14,12 @@ const findAllRecipe = async (req, res) => {
     //   })),
     //   totalData: getData.rowCount,
     // });
-    res.send({
-      data: getData.rows,
-      totalData: getData.rowCount,
-    });
+    if (getData.rowCount > 0) {
+      res.send({
+        data: getData.rows,
+        totalData: getData.rowCount,
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(400).send("Any error");
