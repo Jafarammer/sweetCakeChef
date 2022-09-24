@@ -6,14 +6,10 @@ const controller = require("../../controller/recipe/recipesController");
 // Router.get("/recipe", validateToken.checkToken, controllerRecipe.getAllRecipe); ony example using token
 
 // ADD
-Router.post("recipe/add", uploadMiddleware.uploadSingle, controller.addRecipe);
+Router.post("/add", uploadMiddleware.uploadSingle, controller.addRecipe);
 // EDIT
-Router.patch(
-  "recipe/edit/:id",
-  uploadMiddleware.uploadSingle,
-  controller.editRecipe
-);
+Router.patch("/edit/:id", uploadMiddleware.uploadSingle, controller.editRecipe);
 // DELETE
-Router.delete("recipe/delete/:id", controller.deleteRecipe);
+Router.delete("/delete/:id", controller.deleteRecipe);
 
 module.exports = Router;
