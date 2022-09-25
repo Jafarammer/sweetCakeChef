@@ -1,7 +1,19 @@
 const model = require("../../model/recipe/searchRecipeModel");
 const searchModelUser = require("../../model/user/searchUserModel");
 
-// ALL DATA
+// All data not asc or desc
+const findShowAllRecipe = async (req, res) => {
+  try {
+    const getData = await model.showAllDataModel();
+    res.send({
+      data: getData.rows,
+      totalData: getData.rowCount,
+    });
+  } catch (error) {
+    res.status(400).send("Any error");
+  }
+};
+// ALL DATA DESC
 const findAllRecipe = async (req, res) => {
   try {
     const getData = await model.recipeAllModel();
@@ -22,6 +34,28 @@ const findAllRecipe = async (req, res) => {
     // }
   } catch (error) {
     console.log(error);
+    res.status(400).send("Any error");
+  }
+};
+
+// sort
+const sortRecipe = async (req, res) => {
+  try {
+    const { asc } = req.query;
+    if (asc) {
+      const getAsc = await model.ascModel();
+      res.send({
+        data: getAsc.rows,
+        totalData: getAsc.rowCount,
+      });
+    } else {
+      const getDesc = await model.descModel();
+      res.send({
+        data: getDesc.rows,
+        totalData: getDesc.rowCount,
+      });
+    }
+  } catch (error) {
     res.status(400).send("Any error");
   }
 };
@@ -121,4 +155,6 @@ module.exports = {
   findRecipeUser,
   findRecipeUserId,
   findPageRecipe,
+  sortRecipe,
+  findShowAllRecipe,
 };

@@ -91,6 +91,43 @@ const recipePageModel = (props) => {
   });
 };
 
+// asc
+const ascModel = () => {
+  return new Promise((resolve, rejects) => {
+    db.query("SELECT * FROM recipe ORDER BY id ASC", (error, result) => {
+      if (error) {
+        rejects(error);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+};
+
+const descModel = () => {
+  return new Promise((resolve, rejects) => {
+    db.query("SELECT * FROM recipe ORDER BY id DESC", (error, result) => {
+      if (error) {
+        rejects(error);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+};
+
+const showAllDataModel = () => {
+  return new Promise((resolve, rejects) => {
+    db.query("SELECT * FROM recipe", (error, result) => {
+      if (error) {
+        rejects(error);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+};
+
 module.exports = {
   recipeAllModel,
   recipeById,
@@ -98,4 +135,7 @@ module.exports = {
   recipeByUser,
   recipeUserId,
   recipePageModel,
+  ascModel,
+  descModel,
+  showAllDataModel,
 };
