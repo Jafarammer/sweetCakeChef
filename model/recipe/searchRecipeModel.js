@@ -3,7 +3,7 @@ const db = require("../../config/db");
 // GET ALL
 const recipeAllModel = () => {
   return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM recipe ORDER BY id DESC", (error, result) => {
+    db.query("SELECT * FROM recipe  ORDER BY id DESC", (error, result) => {
       if (error) {
         reject(error);
       } else {
@@ -32,13 +32,17 @@ const recipeByname = (title_recipe) => {
 // FIND BY ID
 const recipeById = (id) => {
   return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM recipe WHERE id = $1", [id], (error, result) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result);
+    db.query(
+      "SELECT * FROM recipe INNER JOIN users ON recipe.user_id = users.id WHERE recipe.id = $1",
+      [id],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
       }
-    });
+    );
   });
 };
 

@@ -3,13 +3,13 @@ const db = require("../../config/db");
 const addUserModel = (props) => {
   return new Promise((resolve, rejects) => {
     db.query(
-      `INSERT INTO users (name, email, phone_number, password, photo) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
+      `INSERT INTO users (name, email, phone_number, password, photo_profile) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
       [
         props.name,
         props.email,
         props.phone_number,
         props.password,
-        props.photo,
+        props.photo_profile,
       ],
       (error, result) => {
         if (error) {
@@ -25,13 +25,13 @@ const addUserModel = (props) => {
 const editUserModel = (props) => {
   return new Promise((resolve, rejects) => {
     db.query(
-      "UPDATE users SET name = $1, email = $2, phone_number = $3, password = $4, photo = $5 WHERE id = $6",
+      "UPDATE users SET name = $1, email = $2, phone_number = $3, password = $4, photo_profile = $5 WHERE id = $6",
       [
         props.name,
         props.email,
         props.phone_number,
         props.password,
-        props.photo,
+        props.photo_profile,
         props.id,
       ],
       (error, result) => {

@@ -44,6 +44,7 @@ const corsOptions = {
   origins: [
     "https://sweet-cake-react.web.app",
     "https://sweet-cake-responsive.vercel.app",
+    // "http://localhost:8000",
   ],
 };
 app.use(cors(corsOptions));

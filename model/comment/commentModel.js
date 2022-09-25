@@ -19,7 +19,7 @@ const addCommentModel = (props) => {
 const getCommentRecipe = (id) => {
   return new Promise((resolve, reject) => {
     db.query(
-      `SELECT comment.*, users.name, users.photo FROM comment LEFT JOIN users ON comment.user_id = users.id WHERE comment.recipe_id = $1 ORDER BY id DESC`,
+      `SELECT comment.*, users.name, users.photo_profile FROM comment LEFT JOIN users ON comment.user_id = users.id WHERE comment.recipe_id = $1 ORDER BY id DESC`,
       [id],
       (error, result) => {
         if (error) {

@@ -6,7 +6,6 @@ const cloudinary = require("../../utils/cloudinary");
 // ADD
 const addUser = async (req, res) => {
   try {
-    console.log(req.file);
     const { name, email, phone_number, password, confirmPassword } = req.body;
     if (password != confirmPassword) {
       res.status(404).send("Password not same!!!");
@@ -56,14 +55,14 @@ const editUser = async (req, res) => {
       let inputEmail = email || searchId.rows[0]?.email;
       let inputPhoneNumber = phone_number || searchId.rows[0]?.phone_number;
       let inputPassword = password || searchId.rows[0]?.password;
-      let inputPhoto = photo || searchId.rows[0]?.photo;
+      let inputPhoto = photo || searchId.rows[0]?.photo_profile;
       const editData = await model.editUserModel({
         name: inputName,
         email: inputEmail,
         phone_number: inputPhoneNumber,
         password: inputPassword,
         // photo: uploadImages.secure_url,
-        photo: inputPhoto,
+        photo_profile: inputPhoto,
         id,
       });
       if (editData) {
