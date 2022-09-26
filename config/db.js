@@ -20,10 +20,10 @@ if (process.env.ENV_MODE === "prod") {
   });
 }
 
-connection.connect(function (err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
+// connection.connect(function (err) {
+//   if (err) throw err;
+//   console.log("Connected!");
+// });
 
 module.exports = connection;
 
