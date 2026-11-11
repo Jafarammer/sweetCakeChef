@@ -1,5 +1,5 @@
 
 .env
-
+/node_modules
 # Ignore all text files
 *.txt
