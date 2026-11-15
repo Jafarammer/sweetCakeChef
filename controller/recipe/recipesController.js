@@ -1,21 +1,38 @@
 const model = require("../../model/recipe/recipeModel");
 const searchModel = require("../../model/recipe/searchRecipeModel");
 const cloudinary = require("../../utils/cloudinary");
+const uploadToCloudinary = require("../../utils/uploadCloudinary");
 
 // ADD
 const addRecipe = async (req, res) => {
   try {
     const { title_recipe, ingredients, user_id } = req.body;
-    const uploadImages = req?.file
-      ? await cloudinary.uploader.upload(req?.file?.path, { folder: "recipe" })
+
+    const photoFile = req.files?.photo?.[0];
+    const videoFiles = req.files?.videos || [];
+
+    const photoResult = photoFile
+      ? await uploadToCloudinary(photoFile, "image")
       : null;
-    // const photo = req?.file ? uploadImages.secure_url : null;
+
+    const videoResults = await Promise.all(
+      videoFiles.map((file) => uploadToCloudinary(file, "video")),
+    );
+
     const getData = await model.addRecipeModel({
       title_recipe,
       ingredients,
-      photo: uploadImages.secure_url,
+      photo: photoResult?.secure_url || null,
       user_id,
     });
+
+    for (const video of videoResults) {
+      await model.addRecipeModelVideo({
+        recipe_id: getData.id_recipe,
+        video_url: video.secure_url,
+      });
+    }
+
     if (getData) {
       res.status(200).send("Data added successfully");
     } else {

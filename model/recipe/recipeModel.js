@@ -2,18 +2,39 @@ const db = require("../../config/db");
 
 // ADD
 const addRecipeModel = (props) => {
-  // const { title_recipe, ingredients, photo } = props;
   return new Promise((resolve, reject) => {
     db.query(
-      "INSERT INTO recipe(title_recipe,ingredients,photo,user_id) VALUES ($1,$2,$3,$4)",
+      `INSERT INTO recipe
+       (title_recipe, ingredients, photo, user_id)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
       [props.title_recipe, props.ingredients, props.photo, props.user_id],
       (error, result) => {
         if (error) {
           reject(error);
         } else {
-          resolve(result);
+          resolve(result.rows[0]);
         }
-      }
+      },
+    );
+  });
+};
+
+const addRecipeModelVideo = (props) => {
+  return new Promise((resolve, reject) => {
+    db.query(
+      `INSERT INTO recipe_videos
+       (recipe_id, video_url)
+       VALUES ($1, $2)
+       RETURNING *`,
+      [props.recipe_id, props.video_url],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.rows[0]);
+        }
+      },
     );
   });
 };
@@ -38,7 +59,7 @@ const editRecipeModel = (props) => {
         } else {
           resolve(result);
         }
-      }
+      },
     );
   });
 };
@@ -60,4 +81,5 @@ module.exports = {
   addRecipeModel,
   editRecipeModel,
   deleteRecipeModel,
+  addRecipeModelVideo,
 };

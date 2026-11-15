@@ -37,6 +37,19 @@ const connection = new Pool({
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT,
 });
+
+// Check database connection
+connection.connect((err, client, release) => {
+  if (err) {
+    console.error("Database connection failed:", err.message);
+    return;
+  }
+
+  console.log("PostgreSQL connected successfully!");
+
+  release();
+});
+
 module.exports = connection;
 
 // const Pool = require("pg").Pool;
