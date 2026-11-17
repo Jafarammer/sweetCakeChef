@@ -84,7 +84,14 @@ const findRecipeId = async (req, res) => {
   try {
     const { id } = req.params;
     const getData = await model.recipeById(id);
-    res.send({ data: getData.rows, totalData: getData.rowCount });
+    const getDataVideo = await model.recipeVideoById(id);
+    res.send({
+      data: {
+        ...getData.rows[0],
+        videos: getDataVideo.rows,
+      },
+      totalData: getData.rowCount,
+    });
   } catch (error) {
     res.status(400).send("Any error");
   }

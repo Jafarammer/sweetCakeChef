@@ -10,14 +10,14 @@ const storage = multer.diskStorage({
     cb(
       null,
       `${Date.now()}_${Math.random()}_${uuidv4()}_${path.extname(
-        file.originalname
-      )}`
+        file.originalname,
+      )}`,
     );
   },
 });
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 },
+  limits: { fileSize: 1500000 },
   fileFilter: fileFilter,
 });
 

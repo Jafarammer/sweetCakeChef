@@ -24,7 +24,7 @@ const recipeByname = (title_recipe) => {
         } else {
           resolve(result);
         }
-      }
+      },
     );
   });
 };
@@ -33,7 +33,7 @@ const recipeByname = (title_recipe) => {
 const recipeById = (id) => {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT * FROM recipe INNER JOIN users ON recipe.user_id = users.id WHERE recipe.id = $1",
+      "SELECT * FROM recipe  WHERE id_recipe = $1",
       [id],
       (error, result) => {
         if (error) {
@@ -41,7 +41,23 @@ const recipeById = (id) => {
         } else {
           resolve(result);
         }
-      }
+      },
+    );
+  });
+};
+
+const recipeVideoById = (id) => {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT * FROM recipe_videos  WHERE recipe_id = $1",
+      [id],
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      },
     );
   });
 };
@@ -57,7 +73,7 @@ const recipeByUser = (id) => {
         } else {
           resolve(result);
         }
-      }
+      },
     );
   });
 };
@@ -73,7 +89,7 @@ const recipeUserId = (user_id) => {
         } else {
           resolve(result);
         }
-      }
+      },
     );
   });
 };
@@ -90,7 +106,7 @@ const recipePageModel = (props) => {
         } else {
           resolve(result);
         }
-      }
+      },
     );
   });
 };
@@ -142,4 +158,5 @@ module.exports = {
   ascModel,
   descModel,
   showAllDataModel,
+  recipeVideoById,
 };
