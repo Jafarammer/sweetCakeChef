@@ -21,3 +21,14 @@ export const registerSchema = z
     message: "Password and confirm password not match",
     path: ["confirmPassword"],
   });
+
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email format!"),
+  password: z
+    .string()
+    .min(8, "Minimum password 8 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Password must contain uppercase letters, lowercase letters, numbers, and special characters.",
+    ),
+});

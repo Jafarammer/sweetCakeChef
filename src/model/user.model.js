@@ -2,7 +2,7 @@ import pool from "../app/db.js";
 
 const findByEmail = async (email) => {
   const query = `
-    select id , name , email, phone_number from users where email = $1 limit 1
+    select id , name , email, phone_number, password from users where email = $1 limit 1
   `;
 
   const values = [email];

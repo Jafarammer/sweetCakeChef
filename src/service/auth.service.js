@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import authRepository from "../repositories/auth.repository.js";
+import { SECRET_KEY, JWT_ACCESS_EXPIRES_IN } from "../utils/env.js";
 
 const register = async (data) => {
   const { name, email, password, phoneNumber } = data;
@@ -24,8 +26,48 @@ const register = async (data) => {
   return payload;
 };
 
+const login = async (data) => {
+  const { email, password } = data;
+
+  const user = await authRepository.findByEmail(email);
+
+  if (!user) {
+    const error = new Error("Invalid email or password");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    const error = new Error("Invalid email or password");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const token = jwt.sign(
+    {
+      userId: user.id,
+    },
+    SECRET_KEY,
+    {
+      expiresIn: JWT_ACCESS_EXPIRES_IN,
+    },
+  );
+
+  return {
+    token,
+    user: {
+      name: user.name,
+      email: user.email,
+      phoneNumber: user.phone_number,
+    },
+  };
+};
+
 const authService = {
   register,
+  login,
 };
 
 export default authService;
