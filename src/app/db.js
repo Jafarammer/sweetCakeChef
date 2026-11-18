@@ -18,15 +18,22 @@ const pool = new Pool({
   port: Number(PGPORT),
 });
 
-export const connectDB = async () => {
-  try {
-    const client = await pool.connect();
-    logging.info("DB connected successfully!");
+pool.on("error", (error) => {
+  logging.error(`[DB] Unexpected pool error: ${error.message}`);
+});
 
-    client.release();
+export const connectDB = async () => {
+  let client;
+
+  try {
+    client = await pool.connect();
+
+    logging.info("[DB] Database connected successfully!");
   } catch (error) {
-    logging.error(`DB connection failed: ${error.message}`);
+    logging.error(`[DB] Database connection failed: ${error.message}`);
     throw error;
+  } finally {
+    client?.release();
   }
 };
 

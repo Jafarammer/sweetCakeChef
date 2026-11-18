@@ -4,6 +4,9 @@ import cors from "cors";
 import helmet from "helmet";
 import { CLIENT_HOST } from "../utils/env.js";
 import cookieParser from "cookie-parser";
+import requestLogger from "../middleware/requestLogger.js";
+// router
+import authRoutes from "../routes/auth.routes.js";
 
 const web = express();
 
@@ -27,7 +30,10 @@ web.use(
   }),
 );
 
+web.use(requestLogger);
+
 web.use(morgan("dev"));
+web.use("/api/auth", authRoutes);
 
 web.get("/health", (_req, res) => {
   res.json({ status: "OK" });
