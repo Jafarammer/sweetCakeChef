@@ -12,17 +12,40 @@ const create = async (client, data) => {
   return result.rows[0];
 };
 
-const findAll = async () => {
+const findAll = async ({ limit, offset }) => {
   const query = `
-    select * from recipe order by id_recipe desc
+    select
+    r.id_recipe,
+    r.title_recipe,
+    r.ingredients,
+    r.photo,
+
+    u.id as user_id,
+    u.name as user_name,
+    u.photo_profile as user_photo
+
+    from recipe r left join users u on r.user_id = u.id
+
+    order by r.id_recipe desc limit $1 offset $2
+  `;
+
+  const result = await pool.query(query, [limit, offset]);
+
+  return result.rows;
+};
+
+const countAll = async () => {
+  const query = `
+    select count(*) as total from recipe
   `;
 
   const result = await pool.query(query);
 
-  return result;
+  return Number(result.rows[0].total);
 };
 
 export default {
   create,
   findAll,
+  countAll,
 };

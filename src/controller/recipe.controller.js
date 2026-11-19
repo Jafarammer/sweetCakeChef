@@ -21,12 +21,16 @@ const addNewRecipe = async (req, res) => {
 
 const getAllRecipe = async (req, res, next) => {
   try {
-    const result = await recipeService.getAllData();
+    const result = await recipeService.getAllData({
+      page: req.query.page,
+      limit: req.query.limit,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Recipes retrieved successfully",
-      data: result.rows,
-      metaData: result.rowCount,
+      data: result.recipes,
+      metaData: result.pagination,
     });
   } catch (error) {
     next();
