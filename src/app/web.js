@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import requestLogger from "../middleware/requestLogger.js";
 // router
 import authRoutes from "../routes/auth.routes.js";
+import recipeRoutes from "../routes/recipe.routes.js";
 
 const web = express();
 
@@ -34,6 +35,7 @@ web.use(requestLogger);
 
 web.use(morgan("dev"));
 web.use("/api/auth", authRoutes);
+web.use("/api/recipe", recipeRoutes);
 
 web.get("/health", (_req, res) => {
   res.json({ status: "OK" });

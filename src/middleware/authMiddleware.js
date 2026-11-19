@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { SECRET_KEY } from "../utils/env";
+import { SECRET_KEY } from "../utils/env.js";
 
 const authToken = (req, res, next) => {
   try {

@@ -13,3 +13,6 @@ export const PGDATABASE = process.env.PGDATABASE;
 export const PGPASSWORD = process.env.PGPASSWORD;
 export const PGPORT = process.env.PGPORT;
 export const SLOW_QUERY_THRESHOLD = process.env.SLOW_QUERY_THRESHOLD;
+export const CLOUD_NAME = process.env.CLOUD_NAME;
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
