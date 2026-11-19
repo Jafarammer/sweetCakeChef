@@ -44,8 +44,37 @@ const countAll = async () => {
   return Number(result.rows[0].total);
 };
 
+const findMyRecipe = async (userId, { limit, offset }) => {
+  const query = `
+  select 
+  id_recipe,
+  title_recipe,
+  ingredients,
+  photo,
+  user_id
+  from recipe where user_id = $1
+  order by id_recipe desc
+  limit $2
+  offset $3
+  `;
+
+  const result = await pool.query(query, [userId, limit, offset]);
+  return result.rows;
+};
+
+const countMyRecipe = async (userId) => {
+  const query = `
+    select count(*) as total from recipe where user_id = $1
+  `;
+
+  const result = await pool.query(query, [userId]);
+  return Number(result.rows[0].total);
+};
+
 export default {
   create,
   findAll,
   countAll,
+  findMyRecipe,
+  countMyRecipe,
 };

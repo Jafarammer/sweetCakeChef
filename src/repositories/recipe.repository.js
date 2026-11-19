@@ -57,7 +57,24 @@ const findAll = async ({ page, limit }) => {
   };
 };
 
+const findMyRecipe = async (userId, { page, limit }) => {
+  const offset = (page - 1) * limit;
+  const [recipes, total] = await Promise.all([
+    databaseLogger(
+      () => recipeModel.findMyRecipe(userId, { limit, offset }),
+      "Get my recipe",
+    ),
+    databaseLogger(() => recipeModel.countMyRecipe(userId), "Count my recipe"),
+  ]);
+
+  return {
+    recipes,
+    total,
+  };
+};
+
 export default {
   create,
   findAll,
+  findMyRecipe,
 };

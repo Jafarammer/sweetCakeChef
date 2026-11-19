@@ -37,9 +37,29 @@ const getAllRecipe = async (req, res, next) => {
   }
 };
 
+const getMyRecipe = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const result = await recipeService.getMyRecipe(userId, {
+      page: req.query.page,
+      limit: req.query.limit,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "My recipes retrieved successfully",
+      data: result.recipes,
+      metaData: result.pagination,
+    });
+  } catch (error) {
+    next();
+  }
+};
+
 const recipeController = {
   addNewRecipe,
   getAllRecipe,
+  getMyRecipe,
 };
 
 export default recipeController;
