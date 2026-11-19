@@ -7,7 +7,7 @@ const addNewRecipe = async (req, res) => {
 
     await recipeService.createRecipe(req.body, req.files, userId);
 
-    return res.status(200).json({
+    return res.status(201).json({
       success: true,
       message: "Create new recipe successfully",
     });
@@ -19,8 +19,23 @@ const addNewRecipe = async (req, res) => {
   }
 };
 
+const getAllRecipe = async (req, res, next) => {
+  try {
+    const result = await recipeService.getAllData();
+    return res.status(200).json({
+      success: true,
+      message: "Recipes retrieved successfully",
+      data: result.rows,
+      metaData: result.rowCount,
+    });
+  } catch (error) {
+    next();
+  }
+};
+
 const recipeController = {
   addNewRecipe,
+  getAllRecipe,
 };
 
 export default recipeController;

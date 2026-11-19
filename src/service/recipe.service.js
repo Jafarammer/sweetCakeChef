@@ -28,8 +28,17 @@ const createRecipe = async (data, files, userId) => {
   });
 };
 
+const getAllData = async () => {
+  const recipes = await recipeRepository.findAll();
+  return {
+    rows: recipes.rows,
+    rowCount: recipes.rowCount,
+  };
+};
+
 const recipeService = {
   createRecipe,
+  getAllData,
 };
 
 export default recipeService;

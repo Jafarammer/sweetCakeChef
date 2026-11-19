@@ -40,6 +40,11 @@ const create = async (data) => {
   }
 };
 
+const findAll = async () => {
+  return await databaseLogger(() => recipeModel.findAll(), "Find all recipe");
+};
+
 export default {
   create,
+  findAll,
 };

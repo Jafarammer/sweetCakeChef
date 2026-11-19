@@ -12,6 +12,17 @@ const create = async (client, data) => {
   return result.rows[0];
 };
 
+const findAll = async () => {
+  const query = `
+    select * from recipe order by id_recipe desc
+  `;
+
+  const result = await pool.query(query);
+
+  return result;
+};
+
 export default {
   create,
+  findAll,
 };
