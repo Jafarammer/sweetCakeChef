@@ -1,7 +1,7 @@
 import recipeService from "../service/recipe.service.js";
 import { logging } from "../app/logging.js";
 
-const addNewRecipe = async (req, res) => {
+const addNewRecipe = async (req, res, next) => {
   try {
     const userId = req.user.userId;
 
@@ -12,10 +12,7 @@ const addNewRecipe = async (req, res) => {
       message: "Create new recipe successfully",
     });
   } catch (error) {
-    return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.statusCode ? error.message : "Internal server error",
-    });
+    next(error);
   }
 };
 
@@ -33,7 +30,7 @@ const getAllRecipe = async (req, res, next) => {
       metaData: result.pagination,
     });
   } catch (error) {
-    next();
+    next(error);
   }
 };
 
@@ -52,7 +49,7 @@ const getMyRecipe = async (req, res, next) => {
       metaData: result.pagination,
     });
   } catch (error) {
-    next();
+    next(error);
   }
 };
 
@@ -66,7 +63,7 @@ const getDetailRecipe = async (req, res, next) => {
       data: result,
     });
   } catch (error) {
-    next();
+    next(error);
   }
 };
 
@@ -74,16 +71,13 @@ const updateRecipe = async (req, res, next) => {
   try {
     const recipeId = req.params.id;
     const userId = req.user.userId;
-    const photo = req.files?.photo?.[0] || null;
-    const videos = req.files?.videos || [];
 
-    const result = await recipeService.updateRecipe({
+    const result = await recipeService.updateRecipe(
+      req.body,
+      req.files,
       recipeId,
       userId,
-      body: req.body,
-      photo,
-      videos,
-    });
+    );
 
     return res.status(200).json({
       success: true,
@@ -91,9 +85,7 @@ const updateRecipe = async (req, res, next) => {
       data: result,
     });
   } catch (error) {
-    console.log("this", error);
-
-    next();
+    next(error);
   }
 };
 

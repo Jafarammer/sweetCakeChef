@@ -3,30 +3,31 @@ import recipeModel from "../model/recipe.model.js";
 import recipeVideoModel from "../model/recipeVideo.model.js";
 import databaseLogger from "../middleware/dbLogger.js";
 
-const create = async (data) => {
+const create = async (userId, payload) => {
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
 
     const recipe = await databaseLogger(
-      () => recipeModel.create(client, data),
+      () => recipeModel.create(client, userId, payload),
       "Insert new recipe",
     );
 
     const videos = [];
 
-    for (const videoUrl of data.videos) {
-      const video = await databaseLogger(
+    for (const video of payload.videos) {
+      const result = await databaseLogger(
         () =>
           recipeVideoModel.create(client, {
             recipeId: recipe.id_recipe,
-            videoUrl: videoUrl,
+            videoUrl: video.url,
+            videoId: video.publicId,
           }),
         "Insert new video",
       );
 
-      videos.push(video);
+      videos.push(result);
     }
 
     await client.query("COMMIT");
@@ -110,7 +111,7 @@ const findMyRecipe = async (userId, { page, limit }) => {
   };
 };
 
-const updateRecipe = async ({ recipeId, userId, body, photo, videos }) => {
+const updateRecipe = async (recipeId, userId, payload) => {
   const client = await pool.connect();
 
   try {
@@ -127,29 +128,28 @@ const updateRecipe = async ({ recipeId, userId, body, photo, videos }) => {
       throw error;
     }
 
-    const updatedRecipe = await databaseLogger(
+    const update = await databaseLogger(
       () =>
         recipeModel.update(client, recipeId, {
-          ...body,
-          ...(photo ? { photo: photo.url } : {}),
+          titleRecipe: payload.titleRecipe,
+          ingredients: payload.ingredients,
+          photo: payload.photo,
+          userId: userId,
         }),
       "Update recipe",
     );
 
-    let updatedVideos = null;
+    const updatedVideos = [];
 
-    if (videos.length > 0) {
+    if (payload.videos.length > 0) {
       await databaseLogger(
         () => recipeVideoModel.deleteByRecipeId(client, recipeId),
         "Delete video for update recipe",
       );
 
-      updatedVideos = [];
-
-      for (const video of videos) {
+      for (const video of payload.videos) {
         const result = await databaseLogger(
-          () =>
-            recipeVideoModel.create(client, { recipeId, videoUrl: video.url }),
+          () => recipeVideoModel.create(client, { recipeId, videoUrl: video }),
           "Update video",
         );
 
@@ -160,7 +160,7 @@ const updateRecipe = async ({ recipeId, userId, body, photo, videos }) => {
     await client.query("COMMIT");
 
     return {
-      ...updateRecipe,
+      ...update,
       videos: updatedVideos,
     };
   } catch (error) {

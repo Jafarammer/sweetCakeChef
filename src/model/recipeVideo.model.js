@@ -2,10 +2,10 @@ import pool from "../app/db.js";
 
 const create = async (client, data) => {
   const query = `
-    insert into recipe_videos (recipe_id,video_url) values ($1,$2) returning *
+    insert into recipe_videos (recipe_id,video_url,video_public_id) values ($1,$2,$3) returning *
   `;
 
-  const values = [data.recipeId, data.videoUrl];
+  const values = [data.recipeId, data.videoUrl, data.videoId];
 
   const result = await client.query(query, values);
 

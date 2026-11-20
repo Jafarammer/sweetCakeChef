@@ -1,11 +1,17 @@
 import pool from "../app/db.js";
 
-const create = async (client, data) => {
+const create = async (client, userId, payload) => {
   const query = `
-    insert into recipe (title_recipe, ingredients, photo, user_id) values ($1,$2,$3,$4) returning *
+    insert into recipe (title_recipe, ingredients, photo, user_id, photo_public_id) values ($1,$2,$3,$4,$5) returning *
   `;
 
-  const values = [data.titleRecipe, data.ingredients, data.photo, data.userId];
+  const values = [
+    payload.titleRecipe,
+    payload.ingredients,
+    payload.photo.url,
+    userId,
+    payload.photo.publicId,
+  ];
 
   const result = await client.query(query, values);
 
@@ -110,34 +116,34 @@ const findByIdAndUser = async (client, recipeId, userId) => {
   return result.rows[0] || null;
 };
 
-const update = async (client, recipeId, data) => {
+const update = async (client, recipeId, payload) => {
   const fields = [];
   const values = [];
   let index = 1;
 
-  if (data.titleRecipe !== undefined) {
+  if (payload.titleRecipe !== undefined) {
     fields.push(`title_recipe = $${index++}`);
-    values.push(data.titleRecipe);
+    values.push(payload.titleRecipe);
   }
 
-  if (data.ingredients !== undefined) {
+  if (payload.ingredients !== undefined) {
     fields.push(`ingredients = $${index++}`);
-    values.push(data.ingredients);
+    values.push(payload.ingredients);
   }
 
-  if (data.photo !== undefined) {
+  if (payload.photo !== undefined) {
     fields.push(`photo = $${index++}`);
-    values.push(data.photo);
+    values.push(payload.photo);
   }
 
   if (fields.length === 0) {
-    return await findByIdAndUser(client, recipeId, data.userId);
+    return await findByIdAndUser(client, recipeId, payload.userId);
   }
 
-  values.push(recipeId);
+  values.push(recipeId, payload.userId);
 
   const query = `
-  update recipe set ${fields.join(", ")} where id_recipe = $${index} returning *
+  update recipe set ${fields.join(", ")} where id_recipe = $${index++} and user_id = $${index}
   `;
 
   const result = await client.query(query, values);

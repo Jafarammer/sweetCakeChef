@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { CLIENT_HOST } from "../utils/env.js";
 import cookieParser from "cookie-parser";
 import requestLogger from "../middleware/requestLogger.js";
+import errorHandler from "../middleware/errorHandler.js";
 // router
 import authRoutes from "../routes/auth.routes.js";
 import recipeRoutes from "../routes/recipe.routes.js";
@@ -36,6 +37,8 @@ web.use(requestLogger);
 web.use(morgan("dev"));
 web.use("/api/auth", authRoutes);
 web.use("/api/recipe", recipeRoutes);
+
+web.use(errorHandler);
 
 web.get("/health", (_req, res) => {
   res.json({ status: "OK" });
