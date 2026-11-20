@@ -110,9 +110,71 @@ const findMyRecipe = async (userId, { page, limit }) => {
   };
 };
 
+const updateRecipe = async ({ recipeId, userId, body, photo, videos }) => {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const existingRecipe = await databaseLogger(
+      () => recipeModel.findByIdAndUser(client, recipeId, userId),
+      "Find recipe by user",
+    );
+
+    if (!existingRecipe) {
+      const error = new Error("Recipe not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const updatedRecipe = await databaseLogger(
+      () =>
+        recipeModel.update(client, recipeId, {
+          ...body,
+          ...(photo ? { photo: photo.url } : {}),
+        }),
+      "Update recipe",
+    );
+
+    let updatedVideos = null;
+
+    if (videos.length > 0) {
+      await databaseLogger(
+        () => recipeVideoModel.deleteByRecipeId(client, recipeId),
+        "Delete video for update recipe",
+      );
+
+      updatedVideos = [];
+
+      for (const video of videos) {
+        const result = await databaseLogger(
+          () =>
+            recipeVideoModel.create(client, { recipeId, videoUrl: video.url }),
+          "Update video",
+        );
+
+        updatedVideos.push(result);
+      }
+    }
+
+    await client.query("COMMIT");
+
+    return {
+      ...updateRecipe,
+      videos: updatedVideos,
+    };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
 export default {
   create,
   findAll,
   findMyRecipe,
   findById,
+  updateRecipe,
 };

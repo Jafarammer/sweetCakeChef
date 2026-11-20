@@ -108,11 +108,42 @@ const getDetailRecipe = async (recipeId) => {
   return recipe;
 };
 
+const updateRecipe = async ({ recipeId, userId, body, photo, videos }) => {
+  const hashTextUpdate =
+    body.titleRecipe !== undefined || body.ingredients !== undefined;
+
+  if (!hashTextUpdate || !photo || videos.length === 0) {
+    const error = new Error("No data provided for update");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const photoResult = photo
+    ? await uploadToCloudinary(photo.buffer, "recipe", "image")
+    : null;
+
+  const videoResult = [];
+
+  for (const video of videos) {
+    const result = await uploadToCloudinary(video.buffer, "recipe", "video");
+    videoResult.push(result);
+  }
+
+  return await recipeRepository.updateRecipe({
+    recipeId,
+    userId,
+    body,
+    photo: photoResult,
+    videos: videoResult,
+  });
+};
+
 const recipeService = {
   createRecipe,
   getAllData,
   getMyRecipe,
   getDetailRecipe,
+  updateRecipe,
 };
 
 export default recipeService;

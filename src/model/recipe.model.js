@@ -100,6 +100,51 @@ const countMyRecipe = async (userId) => {
   return Number(result.rows[0].total);
 };
 
+const findByIdAndUser = async (client, recipeId, userId) => {
+  const query = `
+    select * from recipe where id_recipe = $1 and user_id = $2 limit 1
+  `;
+
+  const result = await client.query(query, [recipeId, userId]);
+
+  return result.rows[0] || null;
+};
+
+const update = async (client, recipeId, data) => {
+  const fields = [];
+  const values = [];
+  let index = 1;
+
+  if (data.titleRecipe !== undefined) {
+    fields.push(`title_recipe = $${index++}`);
+    values.push(data.titleRecipe);
+  }
+
+  if (data.ingredients !== undefined) {
+    fields.push(`ingredients = $${index++}`);
+    values.push(data.ingredients);
+  }
+
+  if (data.photo !== undefined) {
+    fields.push(`photo = $${index++}`);
+    values.push(data.photo);
+  }
+
+  if (fields.length === 0) {
+    return await findByIdAndUser(client, recipeId, data.userId);
+  }
+
+  values.push(recipeId);
+
+  const query = `
+  update recipe set ${fields.join(", ")} where id_recipe = $${index} returning *
+  `;
+
+  const result = await client.query(query, values);
+
+  return result.rows[0] || null;
+};
+
 export default {
   create,
   findAll,
@@ -107,4 +152,6 @@ export default {
   findMyRecipe,
   countMyRecipe,
   findById,
+  update,
+  findByIdAndUser,
 };

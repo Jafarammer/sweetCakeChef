@@ -70,11 +70,39 @@ const getDetailRecipe = async (req, res, next) => {
   }
 };
 
+const updateRecipe = async (req, res, next) => {
+  try {
+    const recipeId = req.params.id;
+    const userId = req.user.userId;
+    const photo = req.files?.photo?.[0] || null;
+    const videos = req.files?.videos || [];
+
+    const result = await recipeService.updateRecipe({
+      recipeId,
+      userId,
+      body: req.body,
+      photo,
+      videos,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Recipe updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.log("this", error);
+
+    next();
+  }
+};
+
 const recipeController = {
   addNewRecipe,
   getAllRecipe,
   getMyRecipe,
   getDetailRecipe,
+  updateRecipe,
 };
 
 export default recipeController;

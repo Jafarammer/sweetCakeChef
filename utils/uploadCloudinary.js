@@ -1,20 +1,22 @@
-const cloudinary = require("./cloudinary");
-
-const uploadToCloudinary = (file, resourceType) => {
+export const uploadToCloudinary = (buffer, folder, resourceType = "image") => {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
-        folder: "recipe",
+        folder,
         resource_type: resourceType,
       },
       (error, result) => {
         if (error) return reject(error);
-        resolve(result);
+
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id,
+        });
       },
     );
 
-    stream.end(file.buffer);
+    const fileBuffer = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
+
+    uploadStream.end(fileBuffer);
   });
 };
-
-module.exports = uploadToCloudinary;
