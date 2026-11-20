@@ -56,10 +56,25 @@ const getMyRecipe = async (req, res, next) => {
   }
 };
 
+const getDetailRecipe = async (req, res, next) => {
+  try {
+    const result = await recipeService.getDetailRecipe(req.params.id);
+
+    return res.status(200).json({
+      succcess: true,
+      message: "Detail recipes retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    next();
+  }
+};
+
 const recipeController = {
   addNewRecipe,
   getAllRecipe,
   getMyRecipe,
+  getDetailRecipe,
 };
 
 export default recipeController;

@@ -57,6 +57,43 @@ const findAll = async ({ page, limit }) => {
   };
 };
 
+const findById = async (recipeId) => {
+  const rows = await databaseLogger(
+    () => recipeModel.findById(recipeId),
+    "Get recipe detail",
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  const firstRow = rows[0];
+
+  const recipe = {
+    id_recipe: firstRow.id_recipe,
+    title_recipe: firstRow.title_recipe,
+    ingredients: firstRow.ingredients,
+    photo: firstRow.photo,
+    user: {
+      id: firstRow.user_id,
+      name: firstRow.user_name,
+      photo: firstRow.user_photo,
+    },
+    videos: [],
+  };
+
+  for (const row of rows) {
+    if (row.video_id) {
+      recipe.videos.push({
+        id: row.video_id,
+        video_url: row.video_url,
+      });
+    }
+  }
+
+  return recipe;
+};
+
 const findMyRecipe = async (userId, { page, limit }) => {
   const offset = (page - 1) * limit;
   const [recipes, total] = await Promise.all([
@@ -77,4 +114,5 @@ export default {
   create,
   findAll,
   findMyRecipe,
+  findById,
 };

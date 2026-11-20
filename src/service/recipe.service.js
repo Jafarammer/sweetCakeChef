@@ -96,10 +96,23 @@ const getMyRecipe = async (userId, { page = 1, limit = 10 }) => {
   };
 };
 
+const getDetailRecipe = async (recipeId) => {
+  const recipe = await recipeRepository.findById(recipeId);
+
+  if (!recipe) {
+    const error = new Error("Recipe not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return recipe;
+};
+
 const recipeService = {
   createRecipe,
   getAllData,
   getMyRecipe,
+  getDetailRecipe,
 };
 
 export default recipeService;

@@ -8,6 +8,7 @@ import upload from "../middleware/uploadMiddleware.js";
 const router = Router();
 
 router.get("/", authToken, recipeController.getAllRecipe);
+router.get("/detail/:id", authToken, recipeController.getDetailRecipe);
 router.get("/my-recipe", authToken, recipeController.getMyRecipe);
 router.post(
   "/create",
