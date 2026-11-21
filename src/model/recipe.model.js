@@ -2,15 +2,15 @@ import pool from "../app/db.js";
 
 const create = async (client, userId, payload) => {
   const query = `
-    insert into recipe (title_recipe, ingredients, photo, user_id, photo_public_id) values ($1,$2,$3,$4,$5) returning *
+    insert into recipe (title_recipe, ingredients, photo, photo_public_id, user_id ) values ($1,$2,$3,$4,$5) returning *
   `;
 
   const values = [
     payload.titleRecipe,
     payload.ingredients,
-    payload.photo.url,
+    payload.photoUrl,
+    payload.photoId,
     userId,
-    payload.photo.publicId,
   ];
 
   const result = await client.query(query, values);
@@ -116,7 +116,7 @@ const findByIdAndUser = async (client, recipeId, userId) => {
   return result.rows[0] || null;
 };
 
-const update = async (client, recipeId, payload) => {
+const update = async (client, recipeId, userId, payload) => {
   const fields = [];
   const values = [];
   let index = 1;
@@ -131,19 +131,19 @@ const update = async (client, recipeId, payload) => {
     values.push(payload.ingredients);
   }
 
-  if (payload.photo !== undefined) {
-    fields.push(`photo = $${index++}`);
-    values.push(payload.photo);
+  if (payload.photoUrl !== undefined && payload.photoId !== undefined) {
+    fields.push(`photo = $${index++}`, `photo_public_id = $${index++}`);
+    values.push(payload.photoUrl, payload.photoId);
   }
 
   if (fields.length === 0) {
     return await findByIdAndUser(client, recipeId, payload.userId);
   }
 
-  values.push(recipeId, payload.userId);
+  values.push(recipeId, userId);
 
   const query = `
-  update recipe set ${fields.join(", ")} where id_recipe = $${index++} and user_id = $${index}
+  update recipe set ${fields.join(", ")} where id_recipe = $${index++} and user_id = $${index} returning *
   `;
 
   const result = await client.query(query, values);

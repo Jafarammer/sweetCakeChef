@@ -10,7 +10,13 @@ const create = async (userId, payload) => {
     await client.query("BEGIN");
 
     const recipe = await databaseLogger(
-      () => recipeModel.create(client, userId, payload),
+      () =>
+        recipeModel.create(client, userId, {
+          titleRecipe: payload.titleRecipe,
+          ingredients: payload.ingredients,
+          photoUrl: payload.photo.url,
+          photoId: payload.photo.publicId,
+        }),
       "Insert new recipe",
     );
 
@@ -130,11 +136,11 @@ const updateRecipe = async (recipeId, userId, payload) => {
 
     const update = await databaseLogger(
       () =>
-        recipeModel.update(client, recipeId, {
+        recipeModel.update(client, recipeId, userId, {
           titleRecipe: payload.titleRecipe,
           ingredients: payload.ingredients,
-          photo: payload.photo,
-          userId: userId,
+          photoUrl: payload.photo?.url,
+          photoId: payload.photo?.publicId,
         }),
       "Update recipe",
     );
@@ -149,7 +155,12 @@ const updateRecipe = async (recipeId, userId, payload) => {
 
       for (const video of payload.videos) {
         const result = await databaseLogger(
-          () => recipeVideoModel.create(client, { recipeId, videoUrl: video }),
+          () =>
+            recipeVideoModel.create(client, {
+              recipeId,
+              videoUrl: video?.url,
+              videoId: video?.publicId,
+            }),
           "Update video",
         );
 

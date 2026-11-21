@@ -6,8 +6,8 @@ const createRecipe = async (body, files, userId) => {
     const hashTextResult =
       body.titleRecipe !== undefined || body.ingredients !== undefined;
 
-    const photo = files.photo[0];
-    const videos = files.videos;
+    const photo = files.photo?.[0];
+    const videos = files?.videos || [];
 
     if (!hashTextResult || !photo || videos.length === 0) {
       const error = new Error("No data provided for create");
@@ -131,28 +131,45 @@ const updateRecipe = async (body, files, recipeId, userId) => {
     const hashTextUpdate =
       body.titleRecipe !== undefined || body.ingredients !== undefined;
 
-    const photo = files.photo[0];
-    const videos = files.videos;
+    const photo = files?.photo?.[0];
+    const videos = files?.videos || [];
 
-    if (!hashTextUpdate || !photo || videos.length === 0) {
+    if (!hashTextUpdate && !photo && !videos.length === 0) {
       const error = new Error("No data provided for update");
       error.statusCode = 400;
       throw error;
     }
 
-    const photoResult = await uploadToCloudinary(photo, "recipe", "image");
+    let photoResult = null;
+
+    if (photo) {
+      const result = await uploadToCloudinary(photo, "recipe", "image");
+      photoResult = result;
+    }
+
     const videoResult = [];
 
-    const uploadedVideos = await Promise.all(
-      videos.map((file) => uploadToCloudinary(file, "recipe", "video")),
-    );
+    if (videos.length > 0) {
+      const uploadedVideos = await Promise.all(
+        videos.map((file) => uploadToCloudinary(file, "recipe", "video")),
 
-    videoResult.push(...uploadedVideos.map((video) => video.url));
+        videoResult.push(
+          ...uploadedVideos.map((video) => ({
+            url: video.url,
+            publicId: video.publicId,
+          })),
+        ),
+      );
+    }
 
     const payload = {
       titleRecipe: body.titleRecipe,
       ingredients: body.ingredients,
-      photo: photoResult.url,
+      // photo: {
+      //   url: photoResult.url,
+      //   publicId: photoResult.publicId,
+      // },
+      photo: photoResult,
       videos: videoResult,
     };
 
