@@ -12,7 +12,15 @@ const create = async (data) => {
   return await databaseLogger(() => userModel.create(data), "User registered");
 };
 
+const findUserProfile = async (userId) => {
+  return await databaseLogger(
+    () => userModel.findById(userId),
+    "Find user by id",
+  );
+};
+
 export default {
   findByEmail,
   create,
+  findUserProfile,
 };

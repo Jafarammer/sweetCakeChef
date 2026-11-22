@@ -65,9 +65,22 @@ const login = async (data) => {
   };
 };
 
+const getProfile = async (userId) => {
+  const profile = await authRepository.findUserProfile(userId);
+
+  if (!profile) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return profile;
+};
+
 const authService = {
   register,
   login,
+  getProfile,
 };
 
 export default authService;

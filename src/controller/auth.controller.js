@@ -33,9 +33,25 @@ const login = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const result = await authService.getProfile(userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const authController = {
   register,
   login,
+  getProfile,
 };
 
 export default authController;

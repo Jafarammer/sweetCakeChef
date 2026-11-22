@@ -1,5 +1,14 @@
 import pool from "../app/db.js";
 
+const findById = async (userId) => {
+  const query = `
+    select id, name, email, phone_number, photo_profile from users where id = $1 limit 1;
+  `;
+  const result = await pool.query(query, [userId]);
+
+  return result.rows[0];
+};
+
 const findByEmail = async (email) => {
   const query = `
     select id , name , email, phone_number, password from users where email = $1 limit 1
@@ -25,4 +34,5 @@ const create = async (data) => {
 export default {
   findByEmail,
   create,
+  findById,
 };
