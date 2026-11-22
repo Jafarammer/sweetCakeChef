@@ -1,4 +1,5 @@
 import pool from "../app/db.js";
+import { NODE_ENV } from "../utils/env.js";
 
 const create = async (client, data) => {
   const query = `
@@ -12,9 +13,11 @@ const create = async (client, data) => {
   return result.rows[0];
 };
 
-const deleteByRecipeId = async (client, recipeId, videoIds) => {
+const deleteForUpdateRecipe = async (client, recipeId, videoIds) => {
+  const type = NODE_ENV === "development" ? "::int[]" : "::uuid[]";
+
   const query = `
-    delete from recipe_videos where recipe_id = $1 and id = any($2::int[]) returning *
+    delete from recipe_videos where recipe_id = $1 and id = any($2${type}) returning *
   `;
 
   return await client.query(query, [recipeId, videoIds]);
@@ -31,8 +34,19 @@ const findByRecipeId = async (client, recipeId) => {
   return result.rows;
 };
 
+const deleteByRecipeId = async (client, recipeId) => {
+  const query = `
+    delete from recipe_videos where recipe_id = $1 returning *
+  `;
+
+  const result = await client.query(query, [recipeId]);
+
+  return result.rows;
+};
+
 export default {
   create,
-  deleteByRecipeId,
+  deleteForUpdateRecipe,
   findByRecipeId,
+  deleteByRecipeId,
 };

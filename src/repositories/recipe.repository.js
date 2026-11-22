@@ -14,8 +14,8 @@ const create = async (userId, payload) => {
         recipeModel.create(client, userId, {
           titleRecipe: payload.titleRecipe,
           ingredients: payload.ingredients,
-          photoUrl: payload.photo.url,
-          photoId: payload.photo.publicId,
+          photoUrl: payload.photo?.url,
+          photoId: payload.photo?.publicId,
         }),
       "Insert new recipe",
     );
@@ -187,12 +187,12 @@ const updateRecipe = async (recipeId, userId, payload) => {
       if (videosToDelete.length > 0) {
         await databaseLogger(
           () =>
-            recipeVideoModel.deleteByRecipeId(
+            recipeVideoModel.deleteForUpdateRecipe(
               client,
               recipeId,
               videosToDelete.map((video) => video.id),
             ),
-          "Delete the video row selected by the user",
+          "Delete the video for update recipe",
         );
       }
       // lakukan create video baru
@@ -249,10 +249,75 @@ const updateRecipe = async (recipeId, userId, payload) => {
   }
 };
 
+const deleteRecipe = async (recipeId, userId) => {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const existingRecipe = await databaseLogger(
+      () => recipeModel.findByIdAndUser(client, recipeId, userId, true),
+      "Find recipe by user",
+    );
+
+    if (!existingRecipe) {
+      const error = new Error("Recipe not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const existingVideos = await databaseLogger(
+      () => recipeVideoModel.findByRecipeId(client, recipeId),
+      "Find video by recipe id",
+    );
+
+    const oldFiles = [];
+
+    if (existingRecipe.photo_public_id) {
+      oldFiles.push({
+        publicId: existingRecipe.photo_public_id,
+        resourceType: "image",
+      });
+    }
+
+    existingVideos.forEach((video) => {
+      if (video.video_public_id) {
+        oldFiles.push({
+          publicId: video.video_public_id,
+          resourceType: "video",
+        });
+      }
+    });
+
+    await databaseLogger(
+      () => recipeVideoModel.deleteByRecipeId(client, recipeId),
+      "Delete video by recipe id",
+    );
+
+    const deleteRecipe = databaseLogger(
+      () => recipeModel.deleteByIdAndUser(client, recipeId, userId),
+      "Delete recipe by id",
+    );
+
+    await client.query("COMMIT");
+
+    return {
+      recipe: deleteRecipe,
+      oldFiles: oldFiles,
+    };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
 export default {
   create,
   findAll,
   findMyRecipe,
   findById,
   updateRecipe,
+  deleteRecipe,
 };

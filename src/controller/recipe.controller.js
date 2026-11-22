@@ -83,12 +83,29 @@ const updateRecipe = async (req, res, next) => {
   }
 };
 
+const deleteRecipe = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    await recipeService.deleteRecipe(id, userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Recipe deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const recipeController = {
   addNewRecipe,
   getAllRecipe,
   getMyRecipe,
   getDetailRecipe,
   updateRecipe,
+  deleteRecipe,
 };
 
 export default recipeController;

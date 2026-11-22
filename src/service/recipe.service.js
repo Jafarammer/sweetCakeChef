@@ -47,10 +47,7 @@ const createRecipe = async (body, files, userId) => {
     const payload = {
       titleRecipe: body.titleRecipe,
       ingredients: body.ingredients,
-      photo: {
-        url: photoResult.url,
-        publicId: photoResult.publicId,
-      },
+      photo: photoResult,
       videos: videoResult,
     };
 
@@ -261,12 +258,35 @@ const updateRecipe = async (body, files, recipeId, userId) => {
   }
 };
 
+const deleteRecipe = async (recipeId, userId) => {
+  const result = await recipeRepository.deleteRecipe(recipeId, userId);
+
+  const oldFiles = result.oldFiles || [];
+
+  const cleanUpResult = await Promise.allSettled(
+    oldFiles.map((file) =>
+      deleteFromCloudinary(file.publicId, file.resourceType),
+    ),
+  );
+
+  cleanUpResult.forEach((cleanUp, index) => {
+    if (cleanUp.status === "rejected") {
+      logging.warn(
+        `[Cloudinary] -- Cloudinary cleanup failed: (Old Files) ${oldFiles[index].publicId} | (Reason) ${cleanUp.reason}`,
+      );
+    }
+  });
+
+  return result.recipe;
+};
+
 const recipeService = {
   createRecipe,
   getAllData,
   getMyRecipe,
   getDetailRecipe,
   updateRecipe,
+  deleteRecipe,
 };
 
 export default recipeService;

@@ -151,6 +151,16 @@ const update = async (client, recipeId, userId, payload) => {
   return result.rows[0] || null;
 };
 
+const deleteByIdAndUser = async (client, recipeId, userId) => {
+  const query = `
+  delete from recipe where id_recipe = $1 and user_id = $2 returning *
+  `;
+
+  const result = await client.query(query, [recipeId, userId]);
+
+  return result.rows[0];
+};
+
 export default {
   create,
   findAll,
@@ -160,4 +170,5 @@ export default {
   findById,
   update,
   findByIdAndUser,
+  deleteByIdAndUser,
 };

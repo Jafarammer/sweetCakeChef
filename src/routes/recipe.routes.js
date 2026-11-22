@@ -36,4 +36,6 @@ router.post(
   recipeController.addNewRecipe,
 );
 
+router.delete("/delete/:id", authToken, recipeController.deleteRecipe);
+
 export default router;
