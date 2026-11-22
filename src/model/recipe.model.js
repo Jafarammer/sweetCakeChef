@@ -106,9 +106,9 @@ const countMyRecipe = async (userId) => {
   return Number(result.rows[0].total);
 };
 
-const findByIdAndUser = async (client, recipeId, userId) => {
+const findByIdAndUser = async (client, recipeId, userId, lock = false) => {
   const query = `
-    select * from recipe where id_recipe = $1 and user_id = $2 limit 1
+    select * from recipe where id_recipe = $1 and user_id = $2 ${lock ? "for update" : ""}
   `;
 
   const result = await client.query(query, [recipeId, userId]);

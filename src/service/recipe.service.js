@@ -1,7 +1,13 @@
 import recipeRepository from "../repositories/recipe.repository.js";
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
+import deleteFromCloudinary from "../utils/deleteFromCloudinary.js";
+import { logging } from "../app/logging.js";
+import isValidUUID from "../utils/isValidUuid.js";
+import { NODE_ENV } from "../utils/env.js";
 
 const createRecipe = async (body, files, userId) => {
+  const uploadedFiles = [];
+
   try {
     const hashTextResult =
       body.titleRecipe !== undefined || body.ingredients !== undefined;
@@ -17,18 +23,26 @@ const createRecipe = async (body, files, userId) => {
 
     const photoResult = await uploadToCloudinary(photo, "recipe", "image");
 
+    uploadedFiles.push({
+      publicId: photoResult.publicId,
+      resourceType: "image",
+    });
+
     const videoResult = [];
 
-    const uploadedVideos = await Promise.all(
-      files.videos.map((file) => uploadToCloudinary(file, "recipe", "video")),
-    );
+    for (const video of videos) {
+      const result = await uploadToCloudinary(video, "recipe", "video");
 
-    videoResult.push(
-      ...uploadedVideos.map((video) => ({
-        url: video.url,
-        publicId: video.publicId,
-      })),
-    );
+      uploadedFiles.push({
+        publicId: result.publicId,
+        resourceType: "video",
+      });
+
+      videoResult.push({
+        url: result.url,
+        publicId: result.publicId,
+      });
+    }
 
     const payload = {
       titleRecipe: body.titleRecipe,
@@ -42,6 +56,12 @@ const createRecipe = async (body, files, userId) => {
 
     return recipeRepository.create(userId, payload);
   } catch (error) {
+    await Promise.allSettled(
+      uploadedFiles.map((file) =>
+        deleteFromCloudinary(file.publicId, file.resourceType),
+      ),
+    );
+
     throw error;
   }
 };
@@ -127,54 +147,116 @@ const getDetailRecipe = async (recipeId) => {
 };
 
 const updateRecipe = async (body, files, recipeId, userId) => {
-  try {
-    const hashTextUpdate =
-      body.titleRecipe !== undefined || body.ingredients !== undefined;
+  // variable untuk menampung id photo atau video yg baru, jika proses gagal save ke db lakukan juga destroy file di cloudinary
+  const uploadedFiles = [];
 
+  try {
     const photo = files?.photo?.[0];
     const videos = files?.videos || [];
+    const hashTextUpdate =
+      body.titleRecipe !== undefined || body.ingredients !== undefined;
+    // variable penampung untuk new photo
+    let photoResult = null;
+    // variable penampung untuk new video
+    const videoResult = [];
+    // variable penampung id video yg di delete atau yang akan di update
+    let deletedVideoIds = JSON.parse(body.deletedVideoIds || "[]");
 
-    if (!hashTextUpdate && !photo && !videos.length === 0) {
+    // validasi id video yg di delete harus int jika prod uuid
+    if (
+      !Array.isArray(deletedVideoIds) ||
+      !deletedVideoIds.every((id) =>
+        NODE_ENV === "development"
+          ? Number.isInteger(Number(id)) && Number(id) > 0
+          : isValidUUID(id),
+      )
+    ) {
+      const error = new Error("Invalid deleted id format");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // validasi input field
+    if (
+      !hashTextUpdate &&
+      !photo &&
+      !videos.length === 0 &&
+      deletedVideoIds.length === 0
+    ) {
       const error = new Error("No data provided for update");
       error.statusCode = 400;
       throw error;
     }
 
-    let photoResult = null;
-
+    // validasi update photo
     if (photo) {
-      const result = await uploadToCloudinary(photo, "recipe", "image");
-      photoResult = result;
+      photoResult = await uploadToCloudinary(photo, "recipe", "image");
+      uploadedFiles.push({
+        publicId: photoResult.publicId,
+        resourceType: "image",
+      });
     }
 
-    const videoResult = [];
-
+    // validasi update video
     if (videos.length > 0) {
-      const uploadedVideos = await Promise.all(
-        videos.map((file) => uploadToCloudinary(file, "recipe", "video")),
-
-        videoResult.push(
-          ...uploadedVideos.map((video) => ({
-            url: video.url,
-            publicId: video.publicId,
-          })),
-        ),
-      );
+      for (const video of videos) {
+        const result = await uploadToCloudinary(video, "recipe", "video");
+        uploadedFiles.push({
+          publicId: result.publicId,
+          resourceType: "video",
+        });
+        videoResult.push({
+          url: result.url,
+          publicId: result.publicId,
+        });
+      }
     }
 
     const payload = {
       titleRecipe: body.titleRecipe,
       ingredients: body.ingredients,
-      // photo: {
-      //   url: photoResult.url,
-      //   publicId: photoResult.publicId,
-      // },
       photo: photoResult,
       videos: videoResult,
+      deletedVideoIds: deletedVideoIds,
     };
 
-    return await recipeRepository.updateRecipe(recipeId, userId, payload);
+    const result = await recipeRepository.updateRecipe(
+      recipeId,
+      userId,
+      payload,
+    );
+
+    // variable ini adalah berisi id file yg di hapus dari db , id yg disini juga yg akan di gunakan untuk proses destroy ke cloudinary
+    const oldFiles = result.oldFiles || [];
+
+    const cleanUpResult = await Promise.allSettled(
+      oldFiles.map((file) =>
+        deleteFromCloudinary(file.publicId, file.resourceType),
+      ),
+    );
+
+    /**
+     * validasi ini adalah untuk melihat log ketika proses destry gagal ke cloudinary, akan tetai validasi ini masih perlu pengembangan, yaitu ,
+     * 1. pembuatan table baru untuk menampung id yg gagal
+     * 2. buatkan fungsi delete ketika prosesnya berhasil di destry sekalin bawa id id yg gagal yang di save di db
+     */
+    cleanUpResult.forEach((cleanUp, index) => {
+      if (cleanUp.status === "rejected") {
+        logging.warn(
+          `[Cloudinary] -- Cloudinary cleanup failed: (Old Files) ${oldFiles[index].publicId} | (Reason) ${cleanUp.reason}`,
+        );
+      }
+    });
+
+    return result;
   } catch (error) {
+    // validasi ketika terjadi error pada saat proses save to db dan ada file yg sudah terupload ke cloudinary, jadi fungsi ini untuk menghapus id id tersebut dari cloudinary
+    await Promise.allSettled(
+      uploadedFiles.map((file) =>
+        deleteFromCloudinary(file.publicId, file.resourceType),
+      ),
+    );
+
     throw error;
   }
 };

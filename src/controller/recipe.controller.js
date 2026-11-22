@@ -72,17 +72,11 @@ const updateRecipe = async (req, res, next) => {
     const recipeId = req.params.id;
     const userId = req.user.userId;
 
-    const result = await recipeService.updateRecipe(
-      req.body,
-      req.files,
-      recipeId,
-      userId,
-    );
+    await recipeService.updateRecipe(req.body, req.files, recipeId, userId);
 
     return res.status(200).json({
       success: true,
       message: "Recipe updated successfully",
-      data: result,
     });
   } catch (error) {
     next(error);

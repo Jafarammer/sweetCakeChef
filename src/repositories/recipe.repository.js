@@ -123,8 +123,9 @@ const updateRecipe = async (recipeId, userId, payload) => {
   try {
     await client.query("BEGIN");
 
+    // validasi recipe id nya ada atau tidak , atau id nya benar atau tidak milik user tsb.
     const existingRecipe = await databaseLogger(
-      () => recipeModel.findByIdAndUser(client, recipeId, userId),
+      () => recipeModel.findByIdAndUser(client, recipeId, userId, true),
       "Find recipe by user",
     );
 
@@ -134,6 +135,89 @@ const updateRecipe = async (recipeId, userId, payload) => {
       throw error;
     }
 
+    // ini adalah variable untuk menampung id file yg di delete dari db, photo atau video.
+    const oldFiles = [];
+
+    // validasi video ada yg di update atau yg didelete, jika tidak ada harusnya proses ini tidak di teruskan.
+    if (payload.videos.length > 0 || payload.deletedVideoIds.length > 0) {
+      // ambil semua video dari user tsb.
+      const existingVideos = await databaseLogger(
+        () => recipeVideoModel.findByRecipeId(client, recipeId),
+        "Find video by recipe id",
+      );
+
+      // reset atau set kembali data id yg akan didelete.
+      const deletedIds = [...new Set(payload.deletedVideoIds.map(String))];
+
+      // ambil id video yg akan di delete
+      const videosToDelete = existingVideos.filter((video) =>
+        deletedIds.includes(String(video.id)),
+      );
+      // tampilkan error ketika id dari video yg akan di delete tidak sama dengan video yg di db
+      if (videosToDelete.length !== deletedIds.length) {
+        const error = new Error(
+          "One or more videos do not belong to this recipe",
+        );
+        error.statusCode = 400;
+        throw error;
+      }
+
+      // Menghitung jumlah video yang tersisa setelah video lama dihapus
+      const remainingVideos = existingVideos.length - videosToDelete.length;
+      // Menghitung jumlah video yang tersisa setelah video lama dihapus
+      const totalVideos = remainingVideos + payload.videos.length;
+
+      // validasi total video
+      if (totalVideos < 1 || totalVideos > 3) {
+        const error = new Error("A recipe must have between 1 and 3 videos");
+        error.statusCode = 400;
+        throw error;
+      }
+      // simpan id yg di delete ke variable oldFiles
+      videosToDelete.forEach((video) => {
+        if (video.video_public_id) {
+          oldFiles.push({
+            publicId: video.video_public_id,
+            resourceType: "video",
+          });
+        }
+      });
+
+      // validasi jika mau update video, delete dlu video lamanya di db sebelum di update data baru agar tidak penuh dbnya
+      if (videosToDelete.length > 0) {
+        await databaseLogger(
+          () =>
+            recipeVideoModel.deleteByRecipeId(
+              client,
+              recipeId,
+              videosToDelete.map((video) => video.id),
+            ),
+          "Delete the video row selected by the user",
+        );
+      }
+      // lakukan create video baru
+      for (const video of payload.videos) {
+        await databaseLogger(
+          () =>
+            recipeVideoModel.create(client, {
+              recipeId,
+              videoUrl: video.url,
+              videoId: video.publicId,
+            }),
+          "Update video",
+        );
+      }
+    }
+
+    // validasi untuk update photo, jika photo tidak di update harusny proses ini di lewati
+    if (payload.photo && existingRecipe.photo_public_id) {
+      oldFiles.push({
+        publicId: existingRecipe.photo_public_id,
+        resourceType: "image",
+      });
+    }
+
+    // update database recipenya
     const update = await databaseLogger(
       () =>
         recipeModel.update(client, recipeId, userId, {
@@ -144,35 +228,18 @@ const updateRecipe = async (recipeId, userId, payload) => {
         }),
       "Update recipe",
     );
-
-    const updatedVideos = [];
-
-    if (payload.videos.length > 0) {
-      await databaseLogger(
-        () => recipeVideoModel.deleteByRecipeId(client, recipeId),
-        "Delete video for update recipe",
-      );
-
-      for (const video of payload.videos) {
-        const result = await databaseLogger(
-          () =>
-            recipeVideoModel.create(client, {
-              recipeId,
-              videoUrl: video?.url,
-              videoId: video?.publicId,
-            }),
-          "Update video",
-        );
-
-        updatedVideos.push(result);
-      }
-    }
+    // ambil data video yg baru base on recipe_id bukan id dari video tetapi id dari recipenya, karna ada dua db recipe dan recipe video
+    const updatedVideos = await databaseLogger(
+      () => recipeVideoModel.findByRecipeId(client, recipeId),
+      "Take list new video",
+    );
 
     await client.query("COMMIT");
 
     return {
       ...update,
       videos: updatedVideos,
+      oldFiles: oldFiles,
     };
   } catch (error) {
     await client.query("ROLLBACK");

@@ -15,7 +15,9 @@ export const updateRecipeSchema = z.object({
     .string()
     .trim()
     .min(3, "Recipe title must be at least 3 characters")
-    .max(255, "Recipe title must not exceed 255 characters"),
+    .max(255, "Recipe title must not exceed 255 characters")
+    .optional(),
 
-  ingredients: z.string().trim().min(1, "Ingredients are required"),
+  ingredients: z.string().trim().min(1, "Ingredients are required").optional(),
+  deletedVideoIds: z.string().optional(),
 });

@@ -12,15 +12,27 @@ const create = async (client, data) => {
   return result.rows[0];
 };
 
-const deleteByRecipeId = async (client, recipeId) => {
+const deleteByRecipeId = async (client, recipeId, videoIds) => {
   const query = `
-    delete from recipe_videos where recipe_id = $1
+    delete from recipe_videos where recipe_id = $1 and id = any($2::int[]) returning *
   `;
 
-  return await client.query(query, [recipeId]);
+  return await client.query(query, [recipeId, videoIds]);
+};
+
+const findByRecipeId = async (client, recipeId) => {
+  const query = `
+    select * from recipe_videos where recipe_id = $1 
+    
+  `;
+
+  const result = await client.query(query, [recipeId]);
+
+  return result.rows;
 };
 
 export default {
   create,
   deleteByRecipeId,
+  findByRecipeId,
 };
