@@ -31,8 +31,46 @@ const create = async (data) => {
   return result.rows[0];
 };
 
+const updatePersonalInformation = async (userId, payload) => {
+  const fields = [];
+  const values = [];
+
+  if (payload.name !== undefined) {
+    values.push(payload.name);
+    fields.push(`name = $${values.length}`);
+  }
+
+  if (payload.email !== undefined) {
+    values.push(payload.email);
+    fields.push(`email = $${values.length}`);
+  }
+
+  if (payload.phoneNumber !== undefined) {
+    values.push(payload.phoneNumber);
+    fields.push(`phone_number = $${values.length}`);
+  }
+
+  if (fields.length === 0) {
+    return null;
+  }
+
+  values.push(userId);
+
+  const query = `
+    update users
+    set ${fields.join(", ")}
+    where id = $${values.length}
+    returning id, name, email, phone_number
+  `;
+
+  const result = await pool.query(query, values);
+
+  return result.rows[0];
+};
+
 export default {
   findByEmail,
   create,
   findById,
+  updatePersonalInformation,
 };

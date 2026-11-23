@@ -32,3 +32,11 @@ export const loginSchema = z.object({
       "Password must contain uppercase letters, lowercase letters, numbers, and special characters.",
     ),
 });
+
+export const updatePersonalInformationSchema = z
+  .object({
+    name: z.string().trim().min(1).max(100),
+    email: z.string().trim().email(),
+    username: z.string().trim().min(3).max(30),
+  })
+  .strict();

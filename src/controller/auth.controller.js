@@ -48,10 +48,28 @@ const getProfile = async (req, res, next) => {
   }
 };
 
+const updatePersonalInformation = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const body = req.body;
+
+    const result = await authService.updatePersonalInformation(userId, body);
+
+    return res.status(201).json({
+      success: true,
+      message: "update profile successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const authController = {
   register,
   login,
   getProfile,
+  updatePersonalInformation,
 };
 
 export default authController;

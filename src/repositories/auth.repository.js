@@ -19,8 +19,53 @@ const findUserProfile = async (userId) => {
   );
 };
 
+const updatePersonalInformation = async (userId, payload) => {
+  const existingUser = await findUserProfile(userId);
+
+  if (!existingUser) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const updatedPayload = {};
+
+  if (payload.name !== existingUser.name) {
+    updatedPayload.name = payload.name;
+  }
+
+  if (payload.email !== existingUser.email) {
+    updatedPayload.email = payload.email;
+  }
+
+  if (payload.phoneNumber !== existingUser.phone_number) {
+    updatedPayload.phoneNumber = payload.phoneNumber;
+  }
+
+  if (Object.keys(updatedPayload).length === 0) {
+    return {
+      name: existingUser.name,
+      email: existingUser.email,
+      phoneNumber: existingUser.phone_number,
+    };
+  }
+
+  if (updatedPayload.email) {
+    const emailExist = await findByEmail(updatedPayload.email);
+
+    if (emailExist) {
+      const error = new Error("Email already registered");
+      error.statusCode = 409;
+      throw error;
+    }
+  }
+
+  return await userModel.updatePersonalInformation(userId, updatedPayload);
+};
+
 export default {
   findByEmail,
   create,
   findUserProfile,
+  updatePersonalInformation,
 };

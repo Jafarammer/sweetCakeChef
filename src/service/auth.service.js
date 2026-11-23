@@ -77,10 +77,27 @@ const getProfile = async (userId) => {
   return profile;
 };
 
+const updatePersonalInformation = async (userId, body) => {
+  if (!body.name && !body.email && !body.phoneNumber) {
+    const error = new Error("No data provided for update");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const payload = {
+    name: body.name,
+    email: body.email,
+    phoneNumber: body.phoneNumber,
+  };
+
+  return await authRepository.updatePersonalInformation(userId, payload);
+};
+
 const authService = {
   register,
   login,
   getProfile,
+  updatePersonalInformation,
 };
 
 export default authService;
