@@ -70,11 +70,28 @@ const updateSecurity = async (req, res, next) => {
     const userId = req.user.userId;
     const body = req.body;
 
-    const result = await authService.updateSecurity(userId, body);
+    await authService.updateSecurity(userId, body);
 
     return res.status(200).json({
       success: true,
       message: "update password successfully",
+      relogin: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updatePhotoProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const files = req.files;
+
+    await authService.updatePhotoProfile(userId, files);
+
+    return res.status(200).json({
+      success: true,
+      message: "Update photo profile successfully",
     });
   } catch (error) {
     next(error);
@@ -87,6 +104,7 @@ const authController = {
   getProfile,
   updatePersonalInformation,
   updateSecurity,
+  updatePhotoProfile,
 };
 
 export default authController;

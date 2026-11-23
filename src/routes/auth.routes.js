@@ -8,6 +8,7 @@ import {
   updateSecuritySchema,
 } from "../validations/auth.validation.js";
 import authToken from "../middleware/authMiddleware.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = Router();
 
@@ -25,6 +26,13 @@ router.patch(
   authToken,
   validate(updateSecuritySchema),
   authController.updateSecurity,
+);
+
+router.patch(
+  "/profile/photo-profile",
+  authToken,
+  upload.fields([{ name: "photo", maxCount: 1 }, ,]),
+  authController.updatePhotoProfile,
 );
 
 export default router;

@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import authRepository from "../repositories/auth.repository.js";
+import deleteFromCloudinary from "../utils/deleteFromCloudinary.js";
+import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 import { SECRET_KEY, JWT_ACCESS_EXPIRES_IN } from "../utils/env.js";
 
 const register = async (data) => {
@@ -38,8 +40,6 @@ const login = async (data) => {
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
-
-  console.log("this", isPasswordValid);
 
   if (!isPasswordValid) {
     const error = new Error("Invalid email or password");
@@ -120,12 +120,65 @@ const updateSecurity = async (userId, body) => {
   return await authRepository.updateSecurity(userId, hashedPassword);
 };
 
+const updatePhotoProfile = async (userId, files) => {
+  const uploadedFiles = [];
+  try {
+    const photo = files?.photo?.[0];
+    let photoResult = null;
+
+    if (!photo) {
+      const error = new Error("No data provided for update");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (photo) {
+      photoResult = await uploadToCloudinary(photo, "recipe", "image");
+      uploadedFiles.push({
+        publicId: photoResult.publicId,
+        resourceType: "image",
+      });
+    }
+
+    const result = await authRepository.updatePhotoProfile(userId, {
+      photo: photoResult,
+    });
+
+    const oldFiles = result.oldFiles || [];
+
+    const cleanUpResult = await Promise.allSettled(
+      oldFiles.map((file) =>
+        deleteFromCloudinary(file.publicId, file.resourceType),
+      ),
+    );
+
+    cleanUpResult.forEach((cleanUp, index) => {
+      if (cleanUp.status === "rejected") {
+        logging.warn(
+          `[Cloudinary] -- Cloudinary cleanup failed: (Old Files) ${oldFiles[index].publicId} | (Reason) ${cleanUp.reason}`,
+        );
+      }
+    });
+
+    return result;
+  } catch (error) {
+    await Promise.allSettled(
+      uploadedFiles.map((file) =>
+        deleteFromCloudinary(file.publicId, file.resourceType),
+      ),
+    );
+
+    throw error;
+  }
+};
+
 const authService = {
   register,
   login,
   getProfile,
   updatePersonalInformation,
   updateSecurity,
+  updatePhotoProfile,
 };
 
 export default authService;

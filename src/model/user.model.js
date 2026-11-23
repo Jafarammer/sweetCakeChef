@@ -2,7 +2,7 @@ import pool from "../app/db.js";
 
 const findById = async (userId) => {
   const query = `
-    select id, name, email, phone_number, photo_profile from users where id = $1 limit 1;
+    select id, name, email, phone_number, photo_profile, photo_profile_id from users where id = $1 limit 1;
   `;
   const result = await pool.query(query, [userId]);
 
@@ -87,6 +87,16 @@ const updateSecurity = async (userId, payload) => {
   return result.rows[0];
 };
 
+const updatePhotoProfile = async (userId, photoUrl, photoId) => {
+  const query = `
+    update users set photo_profile = $1 , photo_profile_id = $2 where id = $3
+  `;
+
+  const result = await pool.query(query, [photoUrl, photoId, userId]);
+
+  return result.rows[0];
+};
+
 export default {
   findByEmail,
   create,
@@ -94,4 +104,5 @@ export default {
   updatePersonalInformation,
   getPasswordByUserId,
   updateSecurity,
+  updatePhotoProfile,
 };

@@ -77,6 +77,39 @@ const updateSecurity = async (userId, payload) => {
   );
 };
 
+const updatePhotoProfile = async (userId, payload) => {
+  const existingUser = await findUserProfile(userId);
+
+  if (!existingUser) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const oldFiles = [];
+
+  if (payload.photo && existingUser.photo_profile_id) {
+    oldFiles.push({
+      publicId: existingUser.photo_profile_id,
+      resourceType: "image",
+    });
+  }
+
+  await databaseLogger(
+    () =>
+      userModel.updatePhotoProfile(
+        userId,
+        payload.photo.url,
+        payload.photo.publicId,
+      ),
+    "Update photo profile",
+  );
+
+  return {
+    oldFiles: oldFiles,
+  };
+};
+
 export default {
   findByEmail,
   create,
@@ -84,4 +117,5 @@ export default {
   updatePersonalInformation,
   getPasswordByUserId,
   updateSecurity,
+  updatePhotoProfile,
 };
