@@ -65,11 +65,28 @@ const updatePersonalInformation = async (req, res, next) => {
   }
 };
 
+const updateSecurity = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const body = req.body;
+
+    const result = await authService.updateSecurity(userId, body);
+
+    return res.status(200).json({
+      success: true,
+      message: "update password successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const authController = {
   register,
   login,
   getProfile,
   updatePersonalInformation,
+  updateSecurity,
 };
 
 export default authController;

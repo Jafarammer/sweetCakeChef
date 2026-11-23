@@ -63,9 +63,25 @@ const updatePersonalInformation = async (userId, payload) => {
   return await userModel.updatePersonalInformation(userId, updatedPayload);
 };
 
+const getPasswordByUserId = async (userId) => {
+  return await databaseLogger(
+    () => userModel.getPasswordByUserId(userId),
+    "Fetch password by id",
+  );
+};
+
+const updateSecurity = async (userId, payload) => {
+  return await databaseLogger(
+    () => userModel.updateSecurity(userId, payload),
+    "Update password",
+  );
+};
+
 export default {
   findByEmail,
   create,
   findUserProfile,
   updatePersonalInformation,
+  getPasswordByUserId,
+  updateSecurity,
 };

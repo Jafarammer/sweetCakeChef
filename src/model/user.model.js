@@ -68,9 +68,30 @@ const updatePersonalInformation = async (userId, payload) => {
   return result.rows[0];
 };
 
+const getPasswordByUserId = async (userId) => {
+  const query = `
+  select password from users where id = $1
+  `;
+
+  const result = await pool.query(query, [userId]);
+  return result.rows[0];
+};
+
+const updateSecurity = async (userId, payload) => {
+  const query = `
+    update users set password = $1 where id = $2 returning id
+  `;
+
+  const result = await pool.query(query, [payload, userId]);
+
+  return result.rows[0];
+};
+
 export default {
   findByEmail,
   create,
   findById,
   updatePersonalInformation,
+  getPasswordByUserId,
+  updateSecurity,
 };

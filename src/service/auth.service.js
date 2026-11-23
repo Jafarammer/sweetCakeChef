@@ -39,6 +39,8 @@ const login = async (data) => {
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
+  console.log("this", isPasswordValid);
+
   if (!isPasswordValid) {
     const error = new Error("Invalid email or password");
     error.statusCode = 401;
@@ -93,11 +95,37 @@ const updatePersonalInformation = async (userId, body) => {
   return await authRepository.updatePersonalInformation(userId, payload);
 };
 
+const updateSecurity = async (userId, body) => {
+  const existingUser = await authRepository.getPasswordByUserId(userId);
+
+  if (!existingUser) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const isPasswordMatch = await bcrypt.compare(
+    body.currentPassword,
+    existingUser.password,
+  );
+
+  if (!isPasswordMatch) {
+    const error = new Error("Current password is incorect");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const hashedPassword = await bcrypt.hash(body.newPassword, 10);
+
+  return await authRepository.updateSecurity(userId, hashedPassword);
+};
+
 const authService = {
   register,
   login,
   getProfile,
   updatePersonalInformation,
+  updateSecurity,
 };
 
 export default authService;
